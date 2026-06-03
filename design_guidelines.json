@@ -1,0 +1,121 @@
+{
+  "theme_and_archetype": {
+    "domain": "Text-based RPG / Life-Sim",
+    "theme": "Dark",
+    "archetype": "5 (Luxury) - Customized to Dark Medieval/Ashen World",
+    "vibe": "Gritty, surviving, historical, melancholic, living world"
+  },
+  "colors": {
+    "background": "#0c0a09",
+    "surface": "#1c1917",
+    "surface_hover": "#292524",
+    "primary": "#c2410c",
+    "primary_hover": "#9a3412",
+    "text_main": "#e7e5e4",
+    "text_muted": "#a8a29e",
+    "border": "#292524",
+    "accent_ember": "#f97316",
+    "accent_ash": "#57534e",
+    "relationship": {
+      "friend": "#15803d",
+      "neutral": "#a8a29e",
+      "enemy": "#991b1b"
+    }
+  },
+  "typography": {
+    "heading_font": "Cinzel, serif",
+    "body_font": "Lora, serif",
+    "hierarchy": {
+      "h1": "text-4xl sm:text-5xl tracking-tight font-bold",
+      "h2": "text-2xl sm:text-3xl tracking-tight",
+      "h3": "text-xl sm:text-2xl",
+      "body": "text-base leading-relaxed",
+      "small_label": "text-xs tracking-[0.2em] uppercase font-bold"
+    }
+  },
+  "spacing_and_layout": {
+    "global_padding": "p-4 sm:p-6 lg:p-8",
+    "card_padding": "p-4 sm:p-6",
+    "gap": "gap-4 sm:gap-6",
+    "radius": "rounded-sm",
+    "navigation": {
+      "mobile": "bottom-0 fixed w-full border-t border-stone-800 bg-stone-950/90 backdrop-blur-md z-50",
+      "desktop": "left-0 top-0 fixed h-full w-64 border-r border-stone-800 bg-stone-950 z-50"
+    }
+  },
+  "components": {
+    "cards": "bg-stone-900 border border-stone-800 rounded-sm shadow-sm",
+    "buttons": {
+      "primary": "bg-orange-700 hover:bg-orange-800 text-stone-200 font-bold tracking-wider rounded-sm",
+      "secondary": "bg-transparent border border-stone-700 hover:border-orange-900 text-stone-300 rounded-sm",
+      "ghost": "hover:bg-stone-800 text-stone-400 hover:text-stone-200"
+    },
+    "inputs": "bg-stone-950 border border-stone-800 text-stone-200 placeholder:text-stone-600 rounded-sm focus:border-orange-700 focus:ring-1 focus:ring-orange-700",
+    "tables": "w-full text-sm text-left border-collapse",
+    "tabs": "border-b border-stone-800 flex space-x-4",
+    "badges": "text-xs px-2 py-1 border rounded-sm"
+  },
+  "screens": {
+    "login": {
+      "layout": "Centered card over cinematic background. Full-screen h-screen flex items-center justify-center.",
+      "elements": "Logo/Title (H1), Email/Password inputs, Login CTA, Register link.",
+      "visuals": "Dark ash/ember background image with an overlay of bg-stone-950/80."
+    },
+    "world_map": {
+      "layout": "Grid or map-view with location cards.",
+      "elements": "List of Kingdoms, Cities, Villages, Castles. Filters. Time advance button ('Bir gün geç')."
+    },
+    "city_detail": {
+      "layout": "Bento Grid (Control Room style). Dense data.",
+      "elements": "Population stat block, Economy/Prices table, Security/Wealth bars, Notable NPCs list, Available Quests."
+    },
+    "character_sheet": {
+      "layout": "Two-column grid on desktop, single stack on mobile.",
+      "elements": "Vitals (Health, Age, Wealth, Reputation). Skills/Profession. Equipment slots."
+    },
+    "inventory_economy": {
+      "layout": "Split view or tabs.",
+      "elements": "Player inventory grid, Market prices table (Wheat, Meat, Iron, Wood, Cloth, Weapons) showing Supply/Demand trends."
+    },
+    "npc_list_detail": {
+      "layout": "Master-detail view (Sidebar list, Main chat/info area).",
+      "elements": "NPC Portrait/Icon, Relationship Score, Personality, Wealth, Family Tree. Template-based Chat interface."
+    },
+    "relationships": {
+      "layout": "List categorized by relation status.",
+      "elements": "Tabs for Friends, Neutral, Enemies. Quick action to interact/chat."
+    },
+    "history_chronicle": {
+      "layout": "Vertical timeline layout.",
+      "elements": "Chronological list of world events (Wars, marriages, deaths, market crashes)."
+    },
+    "battle_screen": {
+      "layout": "Text-based log with action buttons.",
+      "elements": "Combat text log (top/center), Action buttons (Attack, Defend, Flee) fixed at bottom."
+    }
+  },
+  "visual_enhancers": {
+    "texture": "Add a fixed full-screen div with a subtle noise/grain background (opacity-20) pointer-events-none.",
+    "borders": "Use 1px solid borders everywhere to mimic old ledger books.",
+    "shadows": "Keep shadows minimal. Rely on borders for depth.",
+    "motion": "Subtle fade-ins. Hover states should feel like an ember lighting up (transition to burnt orange)."
+  },
+  "media": {
+    "background_embers": "https://images.unsplash.com/photo-1570374953872-7ede4492beb1?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2Njl8MHwxfHNlYXJjaHwzfHxidXJuaW5nJTIwZW1iZXJzJTIwZGFya3xlbnwwfHx8fDE3ODA0ODMzNTB8MA&ixlib=rb-4.1.0&q=85",
+    "background_village": "https://images.pexels.com/photos/14115105/pexels-photo-14115105.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+    "parchment_texture": "https://images.pexels.com/photos/235985/pexels-photo-235985.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940"
+  },
+  "testing": {
+    "required_attributes": "All interactive elements MUST have a data-testid attribute in kebab-case (e.g., data-testid='login-button', data-testid='city-item-3', data-testid='advance-time-button')"
+  },
+  "instructions_to_main_agent": [
+    "Implement the UI using React, Tailwind CSS, and Shadcn UI (.js files, NOT .tsx).",
+    "Enforce the 'ashen world' theme using the stone and orange color palette provided.",
+    "Use 'Cinzel' for headings and 'Lora' for body text. Load these from Google Fonts in index.css.",
+    "Do NOT use generic rounded cards with soft shadows. Use sharp (rounded-sm or rounded-none) bordered cards to simulate medieval ledgers.",
+    "Add a fixed grainy noise overlay to the app to simulate parchment/ash texture.",
+    "Organize complex data (Market prices, NPC lists) using dense Shadcn tables and tabs.",
+    "Include a 'Time Advance' (Bir gün geç) button accessible in the main navigation or header.",
+    "All navigation labels and UI text must be in Turkish."
+  ]
+}
