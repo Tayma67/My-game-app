@@ -1,56 +1,70 @@
-import { useEffect } from "react";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "@/lib/AuthContext";
+import { GameProvider } from "@/lib/GameContext";
+import { Loader2 } from "lucide-react";
 import "@/App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
-import { HOME } from "@/constants/testIds";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import NewGame from "@/pages/NewGame";
+import GameLayout from "@/pages/GameLayout";
+import WorldMap from "@/pages/WorldMap";
+import CityDetail from "@/pages/CityDetail";
+import CharacterSheet from "@/pages/CharacterSheet";
+import Inventory from "@/pages/Inventory";
+import NPCList from "@/pages/NPCList";
+import NPCDetail from "@/pages/NPCDetail";
+import Relationships from "@/pages/Relationships";
+import Chronicle from "@/pages/Chronicle";
+import Quests from "@/pages/Quests";
+import Battle from "@/pages/Battle";
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          data-testid={HOME.emergentLink}
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
-
-function App() {
-  return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
-  );
+function Protected({ children }) {
+  const { user, loading } = useAuth();
+  if (loading || user === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-stone-950 text-stone-500">
+        <Loader2 className="w-6 h-6 animate-spin" />
+      </div>
+    );
+  }
+  if (!user) return <Navigate to="/giris" replace />;
+  return children;
 }
 
-export default App;
+function PublicOnly({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return null;
+  if (user) return <Navigate to="/oyun" replace />;
+  return children;
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <GameProvider>
+          <Routes>
+            <Route path="/" element={<Navigate to="/oyun" replace />} />
+            <Route path="/giris" element={<PublicOnly><Login /></PublicOnly>} />
+            <Route path="/kayit" element={<PublicOnly><Register /></PublicOnly>} />
+            <Route path="/yeni-oyun" element={<Protected><NewGame /></Protected>} />
+            <Route path="/oyun" element={<Protected><GameLayout /></Protected>}>
+              <Route index element={<WorldMap />} />
+              <Route path="sehir/:id" element={<CityDetail />} />
+              <Route path="karakter" element={<CharacterSheet />} />
+              <Route path="envanter" element={<Inventory />} />
+              <Route path="npcler" element={<NPCList />} />
+              <Route path="npc/:id" element={<NPCDetail />} />
+              <Route path="iliskiler" element={<Relationships />} />
+              <Route path="tarih" element={<Chronicle />} />
+              <Route path="gorevler" element={<Quests />} />
+              <Route path="savas" element={<Battle />} />
+            </Route>
+            <Route path="*" element={<Navigate to="/oyun" replace />} />
+          </Routes>
+        </GameProvider>
+      </AuthProvider>
+    </BrowserRouter>
+  );
+}
