@@ -10,6 +10,11 @@ Each response is computed from:
 """
 import random
 import hashlib
+from npc_profile import (
+    ensure_profile, latest_event_line, goal_line, mood_greeting,
+    MOOD_GREETING, GOAL_TALK, GOAL_BY_KEY,
+)
+from rumors import rumor_for_npc
 
 
 REL_BANDS = [
@@ -366,42 +371,88 @@ def _is_child(player):
     return (player.get("age") or 0) < 13
 
 
-def generate_response(npc, relationship_score, topic, player, recent_world_events, day, turn):
+def generate_response(npc, relationship_score, topic, player, recent_world_events, day, turn, state=None):
     """Returns a freshly varied response string.
 
     `turn` is the global interaction count with this NPC (drives repeat lines).
     """
+    ensure_profile(npc)
     rng = _seed_rng(npc["id"], topic, day, turn)
     band = relation_band(relationship_score)
     parts = []
 
+    # Helper: read mood lines from new profile system
+    mood = npc.get("current_mood", "huzurlu")
+
     # --- Child player special path: adult NPCs treat the player as a kid ---
     if _is_child(player):
+        # Parent reactions are warm and specific
+        if npc.get("id") in (player.get("parent_ids") or []):
+            is_mother = npc.get("gender") == "kadın"
+            mom_lines = [
+                f"Yavrum {player['name']}, gel buraya.",
+                "Geldin demek, sofrada ekmek var.",
+                "Sıcak çorba pişiriyordum, koş gel.",
+                "Yine bir tarafın çamur olmuş, gel temizleyeyim.",
+                "Anlat bakalım, gün nasıl geçti?",
+            ]
+            dad_lines = [
+                f"{player['name']}, durma boş, bir iş tutmaya bak.",
+                "Gel buraya oğul/kız, sana bir şey göstereyim.",
+                "İş bitti mi yine? Beni öyle bakarak yorma.",
+                "Hadi yardım eder misin? Kollarım yoruldu.",
+                "Aklında ne var, anlat bakayım.",
+            ]
+            parts = [_pick(rng, mom_lines if is_mother else dad_lines)]
+            # Surface a parent's recent event for variety
+            ev = latest_event_line(npc)
+            if ev and rng.random() < 0.5:
+                parts.append(ev)
+            interactions = npc.get("interactions", {})
+            repeat_count = interactions.get(topic, 0)
+            if repeat_count >= 2:
+                line = REPEAT_LINES.get(min(repeat_count, 5), REPEAT_LINES[5])
+                if line:
+                    parts.insert(0, line)
+            return " ".join(p for p in parts if p)
+
         child_pool = CHILD_REACTIONS.get(
             npc["profession"],
             CHILD_REACTIONS["default_friendly"] if band in ("dost", "arkadaş")
             else CHILD_REACTIONS["default_neutral"],
         )
         parts.append(_pick(rng, child_pool))
-        # Parents react warmly
-        if npc.get("id") in (player.get("parent_ids") or []):
-            parts = [_pick(rng, [
-                f"Yavrum {player['name']}, gel buraya.",
-                "Çocuğum, evde ol vakti olmadan.",
-                "Hadi yavrum, yardım eder misin?",
-            ])]
         # Topic-flavored short note for child
         if topic == "iş":
             parts.append("Sen daha küçüksün, iş zamanı gelmedi.")
         elif topic == "dünya":
-            parts.append("Dünya senin için fazla büyük yavrum.")
+            # Even kids hear rumors!
+            if state is not None:
+                r = rumor_for_npc(npc, state)
+                if r:
+                    parts.append(f"Söylenti diyorlar: {r['text']}")
+                else:
+                    parts.append("Dünya senin için fazla büyük yavrum.")
+            else:
+                parts.append("Dünya senin için fazla büyük yavrum.")
         elif topic == "aile":
             if npc.get("spouse_id"):
                 parts.append("Ailem var çok şükür.")
             else:
                 parts.append("Bekarım, niye sorarsın küçük?")
         elif topic == "hedef":
-            parts.append("Büyüyünce öğrenirsin yavrum.")
+            goal_meta = GOAL_BY_KEY.get(npc["goal"])
+            if goal_meta:
+                parts.append(f"Ben mi? {goal_meta['label'].lower()} istiyorum bir gün.")
+            else:
+                parts.append("Büyüyünce öğrenirsin yavrum.")
+        elif topic == "veda":
+            parts = [_pick(rng, [
+                "Hadi git oyna küçük.",
+                "Eve git, annen merak eder.",
+                "Yolun açık olsun yavrum.",
+                "Eyvallah küçük, dikkatli ol.",
+            ])]
 
         # Repeat escalation still applies (curiosity → hostility)
         interactions = npc.get("interactions", {})
@@ -437,7 +488,15 @@ def generate_response(npc, relationship_score, topic, player, recent_world_event
             parts.append(_pick(rng, LORD_FORMAL).format(pname=pname))
         else:
             parts.append(_pick(rng, GREETING_BY_BAND[band]).format(pname=pname))
-        parts.append(_pick(rng, MOOD_LINE_POOL.get(npc["mood"], [""])))
+        # Mood-driven follow up (new profile system)
+        mg = MOOD_GREETING.get(mood)
+        if mg:
+            parts.append(_pick(rng, mg))
+        # Surface a recent personal event ~40% of the time
+        if rng.random() < 0.4:
+            ev = latest_event_line(npc)
+            if ev:
+                parts.append(ev)
 
     elif topic == "iş":
         if npc["profession"] == "tüccar":
@@ -452,6 +511,10 @@ def generate_response(npc, relationship_score, topic, player, recent_world_event
                 "Her gün aynı, ekmek peşindeyiz.",
             ])
             parts.append(_pick(rng, prof_lines))
+        # Daily log flavor
+        log = npc.get("daily_log") or []
+        if log and rng.random() < 0.5:
+            parts.append(f"Geçen hafta {log[-1]['text']}.")
 
     elif topic == "aile":
         if npc.get("spouse_id"):
@@ -470,34 +533,45 @@ def generate_response(npc, relationship_score, topic, player, recent_world_event
             n = len(npc["children_ids"])
             parts.append(f"{n} çocuğum var, onlar için yaşıyorum.")
         # Personal event surface
-        pe = _personal_event_line(npc, recent_world_events)
+        pe = latest_event_line(npc) or _personal_event_line(npc, recent_world_events)
         if pe:
             parts.append(pe)
 
     elif topic == "dünya":
-        if recent_world_events:
+        # Prefer a rumor from the rumor pool if available
+        chose_rumor = False
+        if state is not None and rng.random() < 0.7:
+            r = rumor_for_npc(npc, state)
+            if r:
+                parts.append(_pick(rng, [
+                    f"Duydun mu? {r['text']}",
+                    f"Bir kulağıma çalındı: {r['text']}",
+                    f"Söylenti dolaşıyor: {r['text']}",
+                ]))
+                chose_rumor = True
+        if not chose_rumor and recent_world_events:
             ev = recent_world_events[-min(10, len(recent_world_events)) + rng.randrange(min(10, len(recent_world_events)))]
             parts.append(_pick(rng, [
                 f"Duydun mu? {ev['text']}",
                 f"Söyledikleri doğruysa: {ev['text']}",
                 f"Köyde duyulan en taze haber: {ev['text']}",
             ]))
-        else:
+        elif not chose_rumor:
             parts.append(_pick(rng, [
                 "Bu civarda son zamanlarda kayda değer pek bir şey olmadı.",
                 "Sessizlik bazen kötüye işarettir.",
             ]))
 
     elif topic == "üzgün":
-        if npc["mood"] in ("umutsuz", "öfkeli", "yorgun"):
-            parts.append("Sorma. " + _pick(rng, MOOD_LINE_POOL[npc["mood"]]))
-            parts.append(f"Hedefim {npc['goal']}, ama her şey ters gidiyor.")
-        elif npc.get("personal_events"):
-            pe = _personal_event_line(npc, recent_world_events)
-            if pe:
-                parts.append(pe)
-            else:
-                parts.append("Eskidendir, geçer.")
+        # Recent event takes priority
+        ev_line = latest_event_line(npc)
+        if ev_line and mood in ("üzgün", "stresli", "öfkeli"):
+            parts.append(ev_line)
+        elif mood in ("üzgün", "stresli", "öfkeli"):
+            parts.append("Sorma. " + _pick(rng, MOOD_GREETING.get(mood, [""])))
+            goal_meta = GOAL_BY_KEY.get(npc["goal"])
+            if goal_meta:
+                parts.append(f"{goal_meta['label']} istiyorum ama her şey ters gidiyor.")
         else:
             parts.append(_pick(rng, [
                 "Üzgün değilim aslında. Belki biraz dalgın.",
@@ -506,7 +580,20 @@ def generate_response(npc, relationship_score, topic, player, recent_world_event
             ]))
 
     elif topic == "hedef":
-        parts.append(f"Hayatta tek istediğim: {npc['goal']}.")
+        goal_meta = GOAL_BY_KEY.get(npc["goal"])
+        if goal_meta:
+            parts.append(f"Hayatta tek istediğim: {goal_meta['label'].lower()}.")
+        gline = goal_line(npc)
+        if gline:
+            parts.append(gline)
+        progress = npc.get("goal_progress", 0)
+        if progress > 0:
+            if progress < 30:
+                parts.append("Daha yolun başındayım.")
+            elif progress < 70:
+                parts.append("Yolun yarısı geride.")
+            else:
+                parts.append("Çok az kaldı, hissediyorum.")
         if band in ("dost", "arkadaş"):
             parts.append(_pick(rng, [
                 "Belki bir gün bana yardım edersin.",
@@ -518,14 +605,37 @@ def generate_response(npc, relationship_score, topic, player, recent_world_event
             parts.append(_pick(rng, [
                 "Git de bir daha gözüm seni görmesin.",
                 "Yolun açık olsun da uzak olsun.",
+                "Defol, bir daha karşıma çıkma.",
             ]))
         elif band in ("dost", "arkadaş"):
             parts.append(_pick(rng, [
                 "Yolun açık olsun, yine bekleriz.",
-                "Eyvallah dostum.",
+                "Eyvallah dostum, kendine iyi bak.",
+                "Allah'a emanet ol, beklerim seni.",
+                "Görüşmek üzere, başın sağ olsun yolculuğunda.",
+            ]))
+        elif mood == "öfkeli":
+            parts.append(_pick(rng, [
+                "Defol, biraz nefes alayım.",
+                "Git, vaktim yok.",
+            ]))
+        elif mood == "üzgün":
+            parts.append(_pick(rng, [
+                "Hadi git, ben başımı yere koyayım.",
+                "Eyvallah... yalnız kalayım biraz.",
+            ]))
+        elif mood == "mutlu":
+            parts.append(_pick(rng, [
+                "Güle güle dostum, gün güzeldi sayende.",
+                "Eyvallah, yine uğra.",
             ]))
         else:
-            parts.append("Hadi eyvallah.")
+            parts.append(_pick(rng, [
+                "Hadi eyvallah.",
+                "Hoşçakal.",
+                "Selametle.",
+                "Yolun açık olsun.",
+            ]))
 
     else:
         parts.append("Anlamadım. Daha açık konuş.")

@@ -1,5 +1,5 @@
 """World simulation: weekly tick (1 turn = 1 week). Ages NPCs/player, marriages,
-births, deaths, real economy, hunger, seasons.
+births, deaths, real economy, hunger, seasons, NPC profiles & rumors.
 """
 import random
 from world_gen import (
@@ -9,19 +9,23 @@ from world_gen import (
 from calendar_tr import (
     WEEKS_PER_YEAR, SEASON_EFFECTS, season_for_turn, current_calendar, player_age,
 )
+from npc_profile import (
+    ensure_profile, push_recent_event, npc_weekly_tick, recompute_mood,
+)
+from rumors import auto_rumors_from_events, seasonal_rumors
 
 
 PRODUCTION = {
-    "çiftçi": ("buğday", 4),
-    "fırıncı": ("ekmek", 3),
-    "avcı": ("et", 2),
-    "balıkçı": ("et", 2),
-    "çoban": ("et", 1),
-    "demirci": ("demir", 1),
-    "marangoz": ("odun", 3),
-    "değirmenci": ("buğday", 2),
+    "çiftçi": ("buğday", 10),
+    "fırıncı": ("ekmek", 8),
+    "avcı": ("et", 6),
+    "balıkçı": ("et", 5),
+    "çoban": ("et", 3),
+    "demirci": ("demir", 3),
+    "marangoz": ("odun", 7),
+    "değirmenci": ("buğday", 5),
     "tüccar": (None, 0),  # they move goods but don't produce
-    "kunduracı": ("kumaş", 1),
+    "kunduracı": ("kumaş", 3),
 }
 
 PROFESSION_NEEDS = {
@@ -82,6 +86,7 @@ def _ensure_npc_fields(npc):
     npc.setdefault("personal_events", [])
     npc.setdefault("bounty", 0)
     npc.setdefault("turn_counter", 0)
+    ensure_profile(npc)
 
 
 def _ensure_state_fields(state):
@@ -91,6 +96,7 @@ def _ensure_state_fields(state):
     state.setdefault("turn", state.get("day", 0))  # legacy: day = turn (weeks)
     state.setdefault("history", [])
     state.setdefault("family_quests", [])
+    state.setdefault("rumors", [])
     p = state["player"]
     p.setdefault("crime", 0)
     p.setdefault("reputation", 0)
@@ -106,6 +112,8 @@ def _ensure_state_fields(state):
     p.setdefault("buffs", {})
     p.setdefault("equipment", {"weapon": None, "head": None, "body": None,
                                "hands": None, "legs": None, "feet": None})
+    p.setdefault("work_units", 0)  # 7 units = 1 week of work
+    p.setdefault("stat_points", 0)
     p["age"] = player_age(state)
     for loc in state["world"]["locations"]:
         _ensure_market(loc)
@@ -128,6 +136,11 @@ def _age_and_die(state, day):
             death_chance += 0.02
         if random.random() < death_chance:
             npc["alive"] = False
+            # Notify family
+            for nid in (npc.get("children_ids") or []) + ([npc.get("spouse_id")] if npc.get("spouse_id") else []):
+                fam = next((x for x in state["world"]["npcs"] if x["id"] == nid and x["alive"]), None)
+                if fam:
+                    push_recent_event(fam, "spouse_lost" if fam.get("spouse_id") == npc["id"] else "friend_died", day)
             _push_event(state, day, "ölüm",
                         f"{npc['name']} ({npc['age']}) {npc['location_name']}'de hayata gözlerini yumdu.")
             # Mark relatives' personal events
@@ -192,6 +205,8 @@ def _marry_and_birth(state, day):
             b["spouse_id"] = a["id"]
             a.setdefault("personal_events", []).append({"type": "evlilik", "day": day, "of": b["name"]})
             b.setdefault("personal_events", []).append({"type": "evlilik", "day": day, "of": a["name"]})
+            push_recent_event(a, "spouse_married", day, b["name"])
+            push_recent_event(b, "spouse_married", day, a["name"])
             used.add(a["id"]); used.add(b["id"])
             _push_event(state, day, "evlilik",
                         f"{a['name']} ile {b['name']}, {a['location_name']}'de dünya evine girdi.")
@@ -234,6 +249,8 @@ def _marry_and_birth(state, day):
             partner["children_ids"].append(child["id"])
             a["personal_events"].append({"type": "doğum", "day": day, "of": child["name"]})
             partner.setdefault("personal_events", []).append({"type": "doğum", "day": day, "of": child["name"]})
+            push_recent_event(a, "child_born", day, child["name"])
+            push_recent_event(partner, "child_born", day, child["name"])
             state["world"]["npcs"].append(child)
             _push_event(state, day, "doğum",
                         f"{a['name']} ve {partner['name']}'in çocuğu {child['name']} doğdu.")
@@ -252,17 +269,22 @@ def _economy_tick(state, day):
     for loc in state["world"]["locations"]:
         _ensure_market(loc)
         local_npcs = npcs_by_loc.get(loc["id"], [])
+        pop = max(10, loc.get("population", 50))
 
         # Production from NPC professions (seasonal multiplier)
         for n in local_npcs:
             prod = PRODUCTION.get(n["profession"])
             if prod and prod[0]:
                 good, amt = prod
-                noise = random.uniform(0.5, 1.5)
-                loc["market"][good]["supply"] += max(0, int(amt * noise * prod_mult))
+                noise = random.uniform(0.7, 1.3)
+                loc["market"][good]["supply"] += max(1, int(amt * noise * prod_mult))
+
+        # Background production scaled to population (so cities don't starve when only a few NPCs are here)
+        bg = max(2, pop // 25)
+        for good in ("buğday", "ekmek", "et", "odun"):
+            loc["market"][good]["supply"] += int(bg * prod_mult * random.uniform(0.6, 1.2))
+
         # NPC consumption drives demand
-        pop = loc["population"]
-        # Each tick consumes ~1.5% of pop on staple foods
         for good, frac in [("ekmek", 0.012), ("buğday", 0.010), ("et", 0.006),
                            ("odun", 0.004), ("kumaş", 0.002), ("demir", 0.002),
                            ("silah", 0.001)]:
@@ -392,6 +414,45 @@ def _generate_quest(state, day):
         })
 
 
+def _npc_profile_tick(state, day):
+    """Each living NPC gets a daily_life activity + small mood drift + maybe a recent_event."""
+    rng = random.Random(day * 7919)
+    for n in state["world"]["npcs"]:
+        if not n["alive"]:
+            continue
+        ensure_profile(n)
+        npc_weekly_tick(n, state, rng)
+
+
+def _family_support_tick(state, day):
+    """Child player (< 13) gets weekly support from living parents."""
+    player = state["player"]
+    if player["age"] >= 13:
+        return
+    parent_ids = player.get("parent_ids") or []
+    living_parents = [n for n in state["world"]["npcs"] if n["id"] in parent_ids and n["alive"]]
+    if not living_parents:
+        return
+    bread = 0
+    coin = 0
+    for parent in living_parents:
+        # Each parent contributes based on their wealth
+        if random.random() < 0.85:
+            bread += 1
+        if parent.get("savings", 0) > 10:
+            give = random.randint(1, 3)
+            coin += give
+            parent["savings"] = max(0, parent.get("savings", 0) - give)
+    if bread > 0:
+        inv = player.setdefault("inventory", {})
+        inv["ekmek"] = inv.get("ekmek", 0) + bread
+    if coin > 0:
+        player["money"] = round(player["money"] + coin, 1)
+    if bread > 0 or coin > 0:
+        _push_event(state, day, "aile_destek",
+                    f"Ailen sana baktı: +{bread} ekmek, +{coin} altın.")
+
+
 def _player_tick(state):
     """Weekly tick for player: hunger, age, buffs decay."""
     player = state["player"]
@@ -433,12 +494,20 @@ def advance_time(state, weeks=1, days=None):
         state["turn"] = state.get("turn", 0) + 1
         state["day"] = state["turn"]
         day = state["turn"]
+        prev_history_len = len(state.get("history", []))
         _age_and_die(state, day)
         _marry_and_birth(state, day)
         _economy_tick(state, day)
         _random_events(state, day)
         _generate_quest(state, day)
+        _npc_profile_tick(state, day)
+        _family_support_tick(state, day)
         _player_tick(state)
+        # Generate rumors from new history events this tick
+        new_events = state["history"][prev_history_len:]
+        if new_events:
+            auto_rumors_from_events(state, new_events)
+        seasonal_rumors(state)
         if len(state["history"]) > 250:
             state["history"] = state["history"][-250:]
     # Auto-unlock family quests at the end of advancement

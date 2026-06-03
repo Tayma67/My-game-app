@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
-import { formatApiErrorDetail } from "@/lib/api";
+import { extractErrorMessage } from "@/lib/api";
 import { Flame } from "lucide-react";
 
 export default function Register() {
@@ -21,7 +21,7 @@ export default function Register() {
       await register(email, password, name);
       navigate("/oyun");
     } catch (e) {
-      setError(formatApiErrorDetail(e.response?.data?.detail) || e.message);
+      setError(extractErrorMessage(e));
     } finally {
       setBusy(false);
     }

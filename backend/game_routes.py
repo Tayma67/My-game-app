@@ -219,7 +219,7 @@ def build_game_router(db):
 
         response = generate_response(
             npc, rel, body.topic, state["player"],
-            state["history"], state["turn"], npc["turn_counter"],
+            state["history"], state["turn"], npc["turn_counter"], state=state,
         )
 
         delta = relationship_delta(npc, body.topic, state["player"], repeat)
@@ -236,6 +236,13 @@ def build_game_router(db):
         })
         if len(npc["memory"]) > 20:
             npc["memory"] = npc["memory"][-20:]
+
+        # Strong-interaction → personal memory
+        from npc_profile import push_personal_memory
+        if stage == "düşmanlık":
+            push_personal_memory(npc, f"{state['player']['name']} beni rahatsız etti")
+        elif delta >= 2:
+            push_personal_memory(npc, f"{state['player']['name']} ile güzel sohbet ettik")
 
         npc.pop("_loc_supply_signal", None)
 
@@ -372,17 +379,17 @@ def build_game_router(db):
     async def work(user: dict = Depends(get_current_user)):
         state = await _load_state(db, user["_id"])
         player = state["player"]
-        # Income scales with stats and skills
-        income_map = {
-            "işsiz": (0, 2),
-            "köylü": (3, 12), "çiftçi": (8, 25), "asker": (15, 35),
-            "tüccar": (20, 60), "avcı": (10, 40), "demirci çırağı": (8, 25),
-            "demirci": (25, 80), "zanaatkar": (15, 45), "haydut": (20, 80),
-            "lord": (100, 500), "şövalye": (40, 120), "şifacı": (20, 70),
-            "katip": (15, 45), "rahip": (15, 50),
+        # Income per DAY scales with stats and skills
+        daily_income_map = {
+            "işsiz": (0, 0),
+            "köylü": (0, 2), "çiftçi": (1, 4), "asker": (2, 5),
+            "tüccar": (3, 8), "avcı": (1, 6), "demirci çırağı": (1, 4),
+            "demirci": (4, 12), "zanaatkar": (2, 7), "haydut": (3, 12),
+            "lord": (15, 70), "şövalye": (6, 18), "şifacı": (3, 10),
+            "katip": (2, 7), "rahip": (2, 8),
         }
         prof = player["profession"]
-        lo, hi = income_map.get(prof, (3, 10))
+        lo, hi = daily_income_map.get(prof, (0, 1))
         # Skill bonus
         skills = player.get("skills", {})
         if prof in ("tüccar", "demirci"):
@@ -390,12 +397,10 @@ def build_game_router(db):
             lo, hi = int(lo * bonus), int(hi * bonus)
         income = random.randint(lo, hi) if hi > lo else lo
         player["money"] = round(player["money"] + income, 1)
-        player["health"] = max(20, player["health"] - random.randint(1, 4))
-        player["hunger"] = max(0, player.get("hunger", 100) - 4)
-        _push_event(state, state["turn"], "çalışma",
-                    f"{player['name']} bir hafta {prof} olarak çalıştı, {income} altın kazandı.")
+        player["health"] = max(20, player["health"] - random.randint(0, 2))
+        player["hunger"] = max(0, player.get("hunger", 100) - 1)
 
-        # Production at current location
+        # Production at current location (small per-day)
         loc = next((l for l in state["world"]["locations"] if l["id"] == player["location_id"]), None)
         if loc:
             from simulation import PRODUCTION
@@ -403,20 +408,38 @@ def build_game_router(db):
             prod = PRODUCTION.get(prof)
             if prod and prod[0]:
                 good, amt = prod
-                loc["market"][good]["supply"] += amt * 3
+                loc["market"][good]["supply"] += max(1, amt // 2)
                 _recompute_prices(loc)
 
-        # Skill/stat training
-        leveled = apply_work_training(player, prof)
-
-        # Child labor still trains stats (early-game shapes adult)
+        # Track work units; 7 units = 1 week passes
+        player["work_units"] = player.get("work_units", 0) + 1
         progress_quest(state, "work")
+        leveled = []
+        days_passed = 1
+        week_passed = False
+        if player["work_units"] >= 7:
+            week_passed = True
+            player["work_units"] = 0
+            # Skill/stat training accumulates at end of week
+            leveled = apply_work_training(player, prof)
+            # Now advance a full week
+            advance_time(state, weeks=1)
+        else:
+            # Manually advance just 1 day's hunger/age effects (no full simulation tick)
+            # We just bump a sub-tracker; calendar stays the same.
+            pass
 
-        advance_time(state, weeks=1)
-        outcome = soldier_check(state)
+        if income > 0:
+            _push_event(state, state["turn"], "çalışma",
+                        f"{player['name']} bir gün {prof} olarak çalıştı, {income} altın.")
+        # No event for işsiz boş günler (gereksiz spam)
+
+        outcome = soldier_check(state) if week_passed else None
         await _save_state(db, user["_id"], state)
         return {"state": _decorate(state), "enforcement": outcome,
-                "income": income, "leveled": leveled}
+                "income": income, "leveled": leveled,
+                "days_passed": days_passed, "week_passed": week_passed,
+                "work_units": player["work_units"]}
 
     # ---------- crime / attack ----------
     @router.post("/crime")
@@ -739,5 +762,48 @@ def build_game_router(db):
                     f"{state['player']['name']} ile {npc['name']} dünya evine girdi.")
         await _save_state(db, user["_id"], state)
         return _decorate(state)
+
+    # ---------- npcs / profile / rumors ----------
+    @router.get("/npc/{npc_id}/profile")
+    async def npc_profile(npc_id: str, user: dict = Depends(get_current_user)):
+        from npc_profile import ensure_profile, GOAL_BY_KEY
+        state = await _load_state(db, user["_id"])
+        npc = next((n for n in state["world"]["npcs"] if n["id"] == npc_id), None)
+        if not npc:
+            raise HTTPException(status_code=404, detail="NPC bulunamadı")
+        ensure_profile(npc)
+        rel = state["relationships"].get(npc_id, 0)
+        # Build readable goal
+        goal_meta = GOAL_BY_KEY.get(npc.get("goal"), {"key": npc.get("goal"), "label": npc.get("goal","-")})
+        return {
+            "id": npc["id"],
+            "name": npc["name"],
+            "age": npc["age"],
+            "gender": npc.get("gender"),
+            "profession": npc["profession"],
+            "location_name": npc["location_name"],
+            "kingdom_name": npc.get("kingdom_name"),
+            "alive": npc["alive"],
+            "personality": npc.get("personality", []),
+            "health": npc.get("health"),
+            "savings": npc.get("savings", 0),
+            "debt": npc.get("debt", 0),
+            "spouse_id": npc.get("spouse_id"),
+            "children_ids": npc.get("children_ids", []),
+            "goal": goal_meta,
+            "goal_progress": npc.get("goal_progress", 0),
+            "current_mood": npc.get("current_mood", "huzurlu"),
+            "recent_events": npc.get("recent_events", []),
+            "daily_log": npc.get("daily_log", []),
+            "personal_memory": npc.get("personal_memory", []),
+            "relationship": rel,
+        }
+
+    @router.get("/rumors")
+    async def list_rumors(user: dict = Depends(get_current_user)):
+        state = await _load_state(db, user["_id"])
+        rumors = state.get("rumors", [])
+        # Return most recent 40
+        return {"rumors": list(reversed(rumors[-40:]))}
 
     return router
