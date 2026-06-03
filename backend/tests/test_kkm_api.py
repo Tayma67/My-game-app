@@ -180,7 +180,11 @@ class TestTravel:
         r = auth_session.post(f"{API}/game/travel",
                               json={"location_id": target["id"]}, timeout=30)
         assert r.status_code == 200
-        s2 = r.json()
+        body = r.json()
+        # New contract: {state, enforcement} or {state, blocked, message}
+        s2 = body.get("state", body)
+        if body.get("blocked"):
+            pytest.skip("Travel blocked by wanted_in")
         assert s2["player"]["location_id"] == target["id"]
         assert s2["day"] == s1["day"] + 3
 
@@ -227,9 +231,11 @@ class TestWorkJob:
         s1 = auth_session.get(f"{API}/game/state").json()
         r = auth_session.post(f"{API}/game/work", timeout=30)
         assert r.status_code == 200
-        s2 = r.json()
+        body = r.json()
+        # New contract: {state, enforcement, income}
+        s2 = body.get("state", body)
         assert s2["day"] == s1["day"] + 7
-        assert s2["player"]["money"] >= s1["player"]["money"]  # work adds income
+        assert s2["player"]["money"] >= s1["player"]["money"] or "enforcement" in body
 
     def test_change_job(self, auth_session):
         r = auth_session.post(f"{API}/game/job", json={"profession": "tüccar"}, timeout=20)

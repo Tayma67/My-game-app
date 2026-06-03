@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useGame } from "@/lib/GameContext";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { ArrowLeft, Crown, Heart, Skull, MessageCircle } from "lucide-react";
+import { ArrowLeft, Crown, Heart, Skull, MessageCircle, Swords, Brain } from "lucide-react";
 
 function bandFromScore(score = 0) {
   if (score < -50) return { name: "düşman", cls: "text-red-400 border-red-900" };
@@ -53,10 +53,16 @@ export default function NPCDetail() {
     setChat((c) => [...c, { from: "p", text: label }]);
     try {
       const { data } = await api.post("/game/chat", { npc_id: npc.id, topic });
-      setChat((c) => [...c, { from: "n", text: data.response, band: data.band }]);
-      // re-fetch state to sync relationship
+      setChat((c) => [...c, {
+        from: "n",
+        text: data.response,
+        repeat: data.repeat_count,
+        delta: data.delta,
+      }]);
+      // sync state so relationship counter + NPC interactions update
       const r = await api.get("/game/state");
       setState(r.data);
+      if (data.hostile) toast.error(`${npc.name} sana saldırıyor!`);
     } catch (e) {
       toast.error("Konuşma başarısız.");
     } finally {
@@ -72,6 +78,29 @@ export default function NPCDetail() {
       toast.success(`${npc.name} ile evlendin!`);
     } catch (e) {
       toast.error(e.response?.data?.detail || "Evlilik reddedildi.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const attack = async () => {
+    if (!window.confirm(`${npc.name}'a saldırmak istediğinden emin misin? Bu suç işlemen anlamına gelir.`)) return;
+    setBusy(true);
+    try {
+      const { data } = await api.post("/game/attack_npc", { npc_id: npc.id });
+      setState(data.state);
+      setChat((c) => [
+        ...c,
+        ...data.log.map((line) => ({ from: "n", text: line })),
+        { from: "n", text: data.outcome === "zafer" ? "ZAFER" : "YENİLDİN", band: "düşman" },
+      ]);
+      if (data.enforcement) {
+        toast.error(`${data.enforcement.by} seni yakaladı! ${data.enforcement.fine} altın ceza.`);
+      } else {
+        toast(data.outcome === "zafer" ? "Saldırı başarılı." : "Yenildin.");
+      }
+    } catch (e) {
+      toast.error(e.response?.data?.detail || "Saldırı başarısız.");
     } finally {
       setBusy(false);
     }
@@ -135,6 +164,33 @@ export default function NPCDetail() {
             <button onClick={marry} disabled={busy} data-testid="npc-marry" className="btn-ember w-full py-2 text-xs font-heading tracking-widest disabled:opacity-50 flex items-center justify-center gap-2">
               <Heart className="w-4 h-4" /> EVLENME TEKLİF ET
             </button>
+          )}
+
+          {npc.alive && npc.location_id === state.player.location_id && (
+            <button
+              onClick={attack}
+              disabled={busy}
+              data-testid="npc-attack"
+              className="w-full py-2 text-xs font-heading tracking-widest disabled:opacity-50 flex items-center justify-center gap-2 border border-red-900 text-red-400 hover:bg-red-950/40 rounded-sm"
+            >
+              <Swords className="w-4 h-4" /> SALDIR
+            </button>
+          )}
+
+          {(npc.memory || []).length > 0 && (
+            <div className="pt-3 border-t border-stone-800">
+              <div className="label-tiny mb-2 flex items-center gap-1"><Brain className="w-3 h-3" /> Hatırladıkları</div>
+              <ul className="text-xs space-y-1 text-stone-500 max-h-32 overflow-y-auto">
+                {(npc.memory || []).slice(-6).reverse().map((m, i) => (
+                  <li key={i} className="flex justify-between gap-2">
+                    <span>Gün {m.day}: <span className="text-stone-300">{m.topic}</span></span>
+                    <span className={m.delta > 0 ? "text-emerald-400" : m.delta < 0 ? "text-red-400" : "text-stone-600"}>
+                      {m.delta > 0 ? `+${m.delta}` : m.delta}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
 

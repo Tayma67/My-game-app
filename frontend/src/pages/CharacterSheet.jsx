@@ -46,8 +46,12 @@ export default function CharacterSheet() {
     setBusy(true);
     try {
       const { data } = await api.post("/game/work");
-      setState(data);
-      toast.success("Bir hafta çalıştın.");
+      setState(data.state || data);
+      if (data.enforcement) {
+        toast.error(`${data.enforcement.by} seni yakaladı: ${data.enforcement.fine} altın ceza.`);
+      } else {
+        toast.success(`Bir hafta çalıştın (+${data.income || 0} altın).`);
+      }
     } catch (e) {
       toast.error("Çalışılamadı.");
     } finally {

@@ -95,6 +95,14 @@ def _make_location(kind: str, name: str, kingdom_id: str, kingdom_name: str):
     prosperity = random.randint(20, 90)
     prices = {g: max(1, round(GOOD_BASE_PRICES[g] * random.uniform(0.7, 1.4), 1))
               for g in GOODS}
+    market = {}
+    for g in GOODS:
+        market[g] = {
+            "price": prices[g],
+            "base": GOOD_BASE_PRICES[g],
+            "supply": max(5, int(population * random.uniform(0.05, 0.15))),
+            "demand": max(5, int(population * random.uniform(0.05, 0.15))),
+        }
     return {
         "id": new_id(),
         "kind": kind,
@@ -106,6 +114,7 @@ def _make_location(kind: str, name: str, kingdom_id: str, kingdom_name: str):
         "security": security,
         "prosperity": prosperity,
         "prices": prices,
+        "market": market,
         "production": random.choice(GOODS),
         "ruler_id": None,
     }
@@ -149,6 +158,11 @@ def _make_npc(location, kingdom_id, kingdom_name, religion, profession=None):
         ]),
         "mood": random.choice(["neşeli", "yorgun", "umutsuz", "kararlı", "huzurlu", "öfkeli"]),
         "alive": True,
+        "interactions": {},
+        "memory": [],
+        "personal_events": [],
+        "bounty": 0,
+        "turn_counter": 0,
     }
 
 
@@ -322,6 +336,9 @@ def generate_player(world):
         "spouse_id": None,
         "children_ids": [],
         "inventory": {"ekmek": 3, "buğday": 5},
+        "wanted_in": [],
+        "interaction_counts": {},
+        "dead": False,
         "skills": {
             "savaş": random.randint(1, 5),
             "ticaret": random.randint(1, 5),

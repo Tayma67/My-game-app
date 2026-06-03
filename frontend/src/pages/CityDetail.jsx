@@ -37,8 +37,17 @@ export default function CityDetail() {
     setBusy(true);
     try {
       const { data } = await api.post("/game/travel", { location_id: loc.id });
-      setState(data);
-      toast.success(`${loc.name}'e ulaştın.`);
+      if (data.blocked) {
+        toast.error(data.message);
+        setState(data.state);
+        return;
+      }
+      setState(data.state);
+      if (data.enforcement) {
+        toast.error(`${data.enforcement.by} seni karşıladı: ${data.enforcement.fine} altın ceza.`);
+      } else {
+        toast.success(`${loc.name}'e ulaştın.`);
+      }
     } catch (e) {
       toast.error("Yolculuk başarısız.");
     } finally {
@@ -103,16 +112,24 @@ export default function CityDetail() {
             <thead>
               <tr className="border-b border-stone-800 text-stone-500 text-xs">
                 <th className="text-left py-2 font-normal label-tiny">Ürün</th>
+                <th className="text-right py-2 font-normal label-tiny">Arz</th>
+                <th className="text-right py-2 font-normal label-tiny">Talep</th>
                 <th className="text-right py-2 font-normal label-tiny">Fiyat</th>
               </tr>
             </thead>
             <tbody>
-              {Object.entries(loc.prices).map(([g, p]) => (
-                <tr key={g} className="border-b border-stone-900">
-                  <td className="py-2 text-stone-200 capitalize">{g}</td>
-                  <td className="py-2 text-right text-amber-400">{p}</td>
-                </tr>
-              ))}
+              {Object.entries(loc.market || {}).map(([g, m]) => {
+                const ratio = m.supply / Math.max(1, m.demand);
+                const cls = ratio < 0.5 ? "text-red-400" : ratio > 1.5 ? "text-emerald-400" : "text-stone-300";
+                return (
+                  <tr key={g} className="border-b border-stone-900">
+                    <td className="py-2 text-stone-200 capitalize">{g}</td>
+                    <td className={`py-2 text-right ${cls}`}>{m.supply}</td>
+                    <td className="py-2 text-right text-stone-400">{m.demand}</td>
+                    <td className="py-2 text-right text-amber-400">{m.price}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
 
@@ -126,7 +143,7 @@ export default function CityDetail() {
                   data-testid="trade-good"
                   className="bg-stone-950 border border-stone-800 px-3 py-2 text-sm rounded-sm"
                 >
-                  {Object.keys(loc.prices).map((g) => <option key={g} value={g}>{g}</option>)}
+                  {Object.keys(loc.market || loc.prices).map((g) => <option key={g} value={g}>{g}</option>)}
                 </select>
                 <input
                   type="number"
