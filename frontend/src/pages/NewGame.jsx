@@ -43,14 +43,20 @@ export default function NewGame() {
         </div>
         <div className="divider-ash mb-6" />
         <p className="text-stone-300 leading-relaxed mb-4">
-          Sen seçilmiş bir kahraman değilsin. Külleri savrulmuş bu dünyada, sıradan bir
-          insansın. Çiftçi olabilirsin, asker, tüccar, avcı ya da bir demirci çırağı...
-          Dünya senden bağımsız akacak: krallıklar savaşacak, krallar ölecek, çocuklar
-          doğacak. Sen sadece bu hikâyenin bir parçasısın.
+          Bu, kahramanların değil <span className="text-orange-400">çocukların</span> hikâyesi.
+          Yedi yaşındasın. Külleri savrulmuş bu dünyada bir köyde annenle babanın yanında
+          doğdun. Zayıf bir kolun, küçük bir aklın var; üstünde köylü giysisi, heybende
+          iki dilim ekmek. Hayat seni bekliyor.
+        </p>
+        <p className="text-stone-300 leading-relaxed mb-4">
+          1 tur = 1 hafta. 48 hafta sonra bir yaş büyüyeceksin.
+          Her kış sandığın incelecek, her yaz tarlalar dolacak. Aç kalırsan zayıflarsın,
+          aç bırakmazsan büyürsün. Çocukken yaptığın her şey —ne kadar tahta sopa salladığın,
+          kaç kez pazarda pazarlık ettiğin— büyüyünce <span className="text-amber-400">kalıcı statlara</span> dönüşecek.
         </p>
         <p className="text-stone-400 italic text-sm mb-8">
-          Karakterin, dünyan ve geçmişin rastgele oluşturulacak. Yolculuğun nereye varacağı
-          ise sana kalmış.
+          13 yaşında dünya sana açılacak: meslek, savaş, ticaret, evlilik. O zamana kadar
+          ailenin görevleri yolun olsun.
         </p>
         <button
           onClick={start}

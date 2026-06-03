@@ -219,10 +219,67 @@ MOOD_LINE_POOL = {
 
 REPEAT_LINES = {
     1: "",
-    2: "Bunu az önce sormadın mı?",
-    3: "Yine mi aynı soru? Cevabım değişmedi.",
-    4: "Sabrımı sınama. Başka derdin yok mu?",
-    5: "Yeter artık, başka konu aç ya da git.",
+    2: "Hmm... bunu az önce sormuş gibisin. Belki yanılıyorum.",  # confusion
+    3: "Yine mi aynı soru? Cevabım değişmedi.",  # irritation
+    4: "Sabrımı sınama. Başka derdin yok mu?",  # near-hostility
+    5: "Yeter artık! Çek git buradan.",  # hostility
+}
+
+
+# 4-stage emotional escalation for repeated questioning:
+# 1 = merak (curiosity/normal)
+# 2 = kafa karışıklığı (confusion)
+# 3 = sinirlilik (irritation)
+# 4+ = düşmanlık (hostility)
+def emotional_stage(repeat_count: int) -> str:
+    if repeat_count <= 1:
+        return "merak"
+    if repeat_count == 2:
+        return "kafa_karışıklığı"
+    if repeat_count == 3:
+        return "sinirlilik"
+    return "düşmanlık"
+
+
+# Child-specific reactions from adult NPCs (player.age < 13)
+CHILD_REACTIONS = {
+    "kral": [
+        "Çocuk! Sarayda işin ne? Annenle babanı bul, geri dön.",
+        "Krallar çocuklarla muhatap olmaz. Çık dışarı.",
+    ],
+    "lord": [
+        "Burası bir çocuğa göre yer değil küçük. Git evine.",
+        "Sana laf etmem yavrum, lordun başka işleri var.",
+    ],
+    "asker": [
+        "Hey küçük, sokakta ne dolaşıyorsun? Evine git.",
+        "Çocuk, kılıçlar tehlikelidir. Uzak dur.",
+    ],
+    "haydut": [
+        "Hee, küçük olan. Cebinde ne var bakalım?",
+        "Çocuksun ama doğru zamanda yanlış yerdesin.",
+    ],
+    "tüccar": [
+        "Ne almak istiyorsun küçüğüm? Paran yetiyor mu?",
+        "Çocuklara şeker veriyorum bazen, ama bugün yok.",
+    ],
+    "şifacı": [
+        "Yaranı göster yavrum, ot sürerim.",
+        "Çocukları severim, gel bakayım.",
+    ],
+    "rahip": [
+        "Tanrılar çocukları korur. Dua etmeyi unutma.",
+        "Küçüksün ama ruhun büyüsün yavrum.",
+    ],
+    "default_friendly": [
+        "Ne haber küçük? Annen biliyor mu burada olduğunu?",
+        "Sen kimin çocuğusun bakalım?",
+        "Yavrum, koş oyna; büyüklerin işine karışma.",
+    ],
+    "default_neutral": [
+        "Çocuk, başka işim var. Sonra konuşuruz.",
+        "Ne istiyorsun yavrum?",
+    ],
 }
 
 
@@ -305,6 +362,10 @@ def _refuse_audience(npc, player):
     return False
 
 
+def _is_child(player):
+    return (player.get("age") or 0) < 13
+
+
 def generate_response(npc, relationship_score, topic, player, recent_world_events, day, turn):
     """Returns a freshly varied response string.
 
@@ -313,6 +374,43 @@ def generate_response(npc, relationship_score, topic, player, recent_world_event
     rng = _seed_rng(npc["id"], topic, day, turn)
     band = relation_band(relationship_score)
     parts = []
+
+    # --- Child player special path: adult NPCs treat the player as a kid ---
+    if _is_child(player):
+        child_pool = CHILD_REACTIONS.get(
+            npc["profession"],
+            CHILD_REACTIONS["default_friendly"] if band in ("dost", "arkadaş")
+            else CHILD_REACTIONS["default_neutral"],
+        )
+        parts.append(_pick(rng, child_pool))
+        # Parents react warmly
+        if npc.get("id") in (player.get("parent_ids") or []):
+            parts = [_pick(rng, [
+                f"Yavrum {player['name']}, gel buraya.",
+                "Çocuğum, evde ol vakti olmadan.",
+                "Hadi yavrum, yardım eder misin?",
+            ])]
+        # Topic-flavored short note for child
+        if topic == "iş":
+            parts.append("Sen daha küçüksün, iş zamanı gelmedi.")
+        elif topic == "dünya":
+            parts.append("Dünya senin için fazla büyük yavrum.")
+        elif topic == "aile":
+            if npc.get("spouse_id"):
+                parts.append("Ailem var çok şükür.")
+            else:
+                parts.append("Bekarım, niye sorarsın küçük?")
+        elif topic == "hedef":
+            parts.append("Büyüyünce öğrenirsin yavrum.")
+
+        # Repeat escalation still applies (curiosity → hostility)
+        interactions = npc.get("interactions", {})
+        repeat_count = interactions.get(topic, 0)
+        if repeat_count >= 2:
+            line = REPEAT_LINES.get(min(repeat_count, 5), REPEAT_LINES[5])
+            if line:
+                parts.insert(0, line)
+        return " ".join(p for p in parts if p)
 
     # Refuse audience for nobility if unworthy
     if topic == "selam" and _refuse_audience(npc, player):
@@ -323,7 +421,7 @@ def generate_response(npc, relationship_score, topic, player, recent_world_event
 
     # Repeat detection
     interactions = npc.get("interactions", {})
-    repeat_count = interactions.get(topic, 0) + 1
+    repeat_count = interactions.get(topic, 0)
 
     pname = player["name"]
 
@@ -464,9 +562,20 @@ DIALOG_TOPICS = [
 
 
 def relationship_delta(npc, topic, player, repeat_count):
-    """How much should relationship change for this interaction?"""
-    if repeat_count >= 3:
-        return -1  # annoying repetition hurts
+    """How much should relationship change for this interaction?
+
+    Emotional stages affect relationship:
+    1 (merak)         → base topic delta
+    2 (kafa karış.)   → -1 (slight)
+    3 (sinirlilik)    → -2
+    4+ (düşmanlık)    → -4
+    """
+    if repeat_count >= 4:
+        return -4
+    if repeat_count == 3:
+        return -2
+    if repeat_count == 2:
+        return -1
     if topic == "selam":
         base = 1
     elif topic == "aile":

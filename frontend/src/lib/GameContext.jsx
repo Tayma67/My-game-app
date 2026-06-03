@@ -14,7 +14,7 @@ export function GameProvider({ children }) {
       setState(data);
       return data;
     } catch (e) {
-      if (e?.response?.status === 404) {
+      if (e?.response?.status === 404 || e?.response?.status === 409) {
         setState(false);
         return null;
       }
@@ -35,8 +35,8 @@ export function GameProvider({ children }) {
     setState(false);
   }, []);
 
-  const advance = useCallback(async (days = 7) => {
-    const { data } = await api.post(`/game/advance?days=${days}`);
+  const advance = useCallback(async (weeks = 1) => {
+    const { data } = await api.post(`/game/advance?weeks=${weeks}`);
     setState(data);
     return data;
   }, []);

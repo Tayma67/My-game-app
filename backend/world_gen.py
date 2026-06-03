@@ -312,40 +312,90 @@ def generate_world(n_kingdoms=3, n_cities=3, n_villages=10, n_castles=5, n_npcs=
     }
 
 
-def generate_player(world):
-    gender = random.choice(["erkek", "kadın"])
-    age = random.randint(18, 30)
-    location = random.choice([l for l in world["locations"] if l["kind"] != "kale"])
+def generate_player(world, name=None, gender=None):
+    """V3: Player starts at age 7 with weak base stats. Family NPCs (mother + father)
+    are spawned in a village/town and linked as parents.
+    """
+    gender = gender or random.choice(["erkek", "kadın"])
+    given = random.choice(MALE_NAMES if gender == "erkek" else FEMALE_NAMES)
+    surname = random.choice(SURNAMES)
+    player_name = name or f"{given} {surname}"
+    # Children belong in villages, not capitals/castles
+    villages = [l for l in world["locations"] if l["kind"] == "köy"]
+    location = random.choice(villages) if villages else random.choice(world["locations"])
     kingdom = next(k for k in world["kingdoms"] if k["id"] == location["kingdom_id"])
-    return {
-        "name": _pick_name(gender),
+
+    # Create family NPCs
+    mother, father = _make_family_for_player(world, player_name, surname, location, kingdom)
+
+    player = {
+        "name": player_name,
         "gender": gender,
-        "age": age,
+        "base_age": 7,
+        "age": 7,
         "culture": kingdom["culture"],
         "religion": kingdom["religion"],
         "kingdom_id": kingdom["id"],
         "kingdom_name": kingdom["name"],
-        "money": random.randint(50, 250),
-        "profession": random.choice(PLAYER_START_PROFESSIONS),
-        "education": random.choice(["yok", "temel", "orta", "iyi"]),
+        "surname": surname,
+        "money": 0,
+        "profession": "işsiz",
+        "education": "yok",
         "reputation": 0,
         "health": 100,
+        "hunger": 100,
         "crime": 0,
         "location_id": location["id"],
         "location_name": location["name"],
         "spouse_id": None,
         "children_ids": [],
-        "inventory": {"ekmek": 3, "buğday": 5},
+        "parent_ids": [mother["id"], father["id"]],
+        "inventory": {"ekmek": 2},
+        "equipment": {"weapon": None, "head": None, "body": "köylü_giysisi",
+                      "hands": None, "legs": None, "feet": None},
         "wanted_in": [],
         "interaction_counts": {},
         "dead": False,
-        "skills": {
-            "savaş": random.randint(1, 5),
-            "ticaret": random.randint(1, 5),
-            "avcılık": random.randint(1, 5),
-            "diplomasi": random.randint(1, 5),
-        },
+        # 4 core stats — child starts weak (1)
+        "stats": {"strength": 1, "intelligence": 1, "charisma": 1, "stamina": 2},
+        "stat_xp": {"strength": 0, "intelligence": 0, "charisma": 0, "stamina": 0},
+        # 4 skill trees
+        "skills": {"combat": 0, "trade": 0, "crafting": 0, "social": 0},
+        "skill_xp": {"combat": 0, "trade": 0, "crafting": 0, "social": 0},
+        "buffs": {},
     }
+    return player, mother, father
+
+
+def _make_family_for_player(world, child_name, surname, location, kingdom):
+    """Create mother (housekeeper/farmer) and father (peasant/blacksmith) NPCs."""
+    mother = _make_npc(location, kingdom["id"], kingdom["name"],
+                       kingdom["religion"], profession=random.choice(["çiftçi", "köylü", "fırıncı"]))
+    mother["gender"] = "kadın"
+    mother["age"] = random.randint(28, 40)
+    mname = random.choice(FEMALE_NAMES)
+    mother["name"] = f"{mname} {surname}"
+    mother["children_ids"] = ["PLAYER"]
+    mother["mood"] = "huzurlu"
+    mother["health"] = random.randint(70, 95)
+
+    father = _make_npc(location, kingdom["id"], kingdom["name"],
+                       kingdom["religion"], profession=random.choice(["demirci", "çiftçi", "avcı", "marangoz"]))
+    father["gender"] = "erkek"
+    father["age"] = random.randint(30, 45)
+    fname = random.choice(MALE_NAMES)
+    father["name"] = f"{fname} {surname}"
+    father["children_ids"] = ["PLAYER"]
+    father["mood"] = "kararlı"
+    father["health"] = random.randint(70, 95)
+
+    # Link as spouses
+    mother["spouse_id"] = father["id"]
+    father["spouse_id"] = mother["id"]
+
+    world["npcs"].append(mother)
+    world["npcs"].append(father)
+    return mother, father
 
 
 def initial_history():

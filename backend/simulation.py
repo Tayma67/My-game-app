@@ -1,17 +1,13 @@
-"""World simulation: aging, marriage, births, deaths, real economy, events.
-
-Economy model:
-- Each location has `market[good] = {price, supply, demand, base}`.
-- Production: NPCs of relevant professions add to supply each tick.
-- Consumption: population consumes from supply, generating demand.
-- Price = base * (demand / max(1, supply))^0.4 * wealth_factor.
-- Player buy decreases supply; player sell increases supply.
-- NPC trading: a random subset of merchants moves goods between locations.
+"""World simulation: weekly tick (1 turn = 1 week). Ages NPCs/player, marriages,
+births, deaths, real economy, hunger, seasons.
 """
 import random
 from world_gen import (
     new_id, MALE_NAMES, FEMALE_NAMES, SURNAMES, GOODS, GOOD_BASE_PRICES,
     PROFESSIONS_COMMON, PERSONALITY_TRAITS,
+)
+from calendar_tr import (
+    WEEKS_PER_YEAR, SEASON_EFFECTS, season_for_turn, current_calendar, player_age,
 )
 
 
@@ -92,12 +88,25 @@ def _ensure_state_fields(state):
     state.setdefault("relationships", {})
     state.setdefault("quests", [])
     state.setdefault("day", 0)
+    state.setdefault("turn", state.get("day", 0))  # legacy: day = turn (weeks)
     state.setdefault("history", [])
-    state["player"].setdefault("crime", 0)
-    state["player"].setdefault("reputation", 0)
-    state["player"].setdefault("wanted_in", [])  # kingdom_ids that want player
-    state["player"].setdefault("interaction_counts", {})  # global per-NPC turn count
-    state["player"].setdefault("dead", False)
+    state.setdefault("family_quests", [])
+    p = state["player"]
+    p.setdefault("crime", 0)
+    p.setdefault("reputation", 0)
+    p.setdefault("wanted_in", [])
+    p.setdefault("interaction_counts", {})
+    p.setdefault("dead", False)
+    p.setdefault("hunger", 100)
+    p.setdefault("base_age", p.get("age", 7))
+    p.setdefault("stats", {"strength": 1, "intelligence": 1, "charisma": 1, "stamina": 2})
+    p.setdefault("stat_xp", {"strength": 0, "intelligence": 0, "charisma": 0, "stamina": 0})
+    p.setdefault("skills", {"combat": 0, "trade": 0, "crafting": 0, "social": 0})
+    p.setdefault("skill_xp", {"combat": 0, "trade": 0, "crafting": 0, "social": 0})
+    p.setdefault("buffs", {})
+    p.setdefault("equipment", {"weapon": None, "head": None, "body": None,
+                               "hands": None, "legs": None, "feet": None})
+    p["age"] = player_age(state)
     for loc in state["world"]["locations"]:
         _ensure_market(loc)
     for npc in state["world"]["npcs"]:
@@ -106,13 +115,17 @@ def _ensure_state_fields(state):
 
 # ---------- NPC life events ----------
 def _age_and_die(state, day):
+    """Weekly tick: 1/WEEKS_PER_YEAR chance to age per week (so ~1yr per cycle)."""
+    age_chance = 1.0 / WEEKS_PER_YEAR
     for npc in [n for n in state["world"]["npcs"] if n["alive"]]:
-        if random.random() < 0.025:
+        if random.random() < age_chance:
             npc["age"] += 1
-        npc["health"] = max(0, npc["health"] - random.randint(0, 1))
-        death_chance = 0.0006 + max(0, (npc["age"] - 55)) * 0.0018
+        # Slow health drift
+        if random.random() < 0.08:
+            npc["health"] = max(0, npc["health"] - random.randint(0, 1))
+        death_chance = 0.0002 + max(0, (npc["age"] - 55)) * 0.0006
         if npc["health"] < 20:
-            death_chance += 0.05
+            death_chance += 0.02
         if random.random() < death_chance:
             npc["alive"] = False
             _push_event(state, day, "ölüm",
@@ -228,6 +241,8 @@ def _marry_and_birth(state, day):
 
 # ---------- Economy ----------
 def _economy_tick(state, day):
+    season = season_for_turn(state.get("turn", 0))
+    prod_mult = SEASON_EFFECTS[season]["production_mult"]
     npcs_by_loc = {}
     for n in state["world"]["npcs"]:
         if not n["alive"]:
@@ -238,14 +253,13 @@ def _economy_tick(state, day):
         _ensure_market(loc)
         local_npcs = npcs_by_loc.get(loc["id"], [])
 
-        # Production from NPC professions
+        # Production from NPC professions (seasonal multiplier)
         for n in local_npcs:
             prod = PRODUCTION.get(n["profession"])
             if prod and prod[0]:
                 good, amt = prod
-                # Wealth/security influence productivity
                 noise = random.uniform(0.5, 1.5)
-                loc["market"][good]["supply"] += max(0, int(amt * noise))
+                loc["market"][good]["supply"] += max(0, int(amt * noise * prod_mult))
         # NPC consumption drives demand
         pop = loc["population"]
         # Each tick consumes ~1.5% of pop on staple foods
@@ -379,22 +393,46 @@ def _generate_quest(state, day):
 
 
 def _player_tick(state):
+    """Weekly tick for player: hunger, age, buffs decay."""
     player = state["player"]
-    if random.random() < 0.02:
-        player["age"] += 1
-    player["health"] = min(100, player["health"] + 1)
-    # Player old age death
+    season = season_for_turn(state.get("turn", 0))
+    hunger_mult = SEASON_EFFECTS[season]["hunger_mult"]
+    # Hunger -5 per week (modified by season). Stamina passive lowers loss slightly.
+    sta = player.get("stats", {}).get("stamina", 1)
+    loss = max(2, int(round(5 * hunger_mult - sta * 0.15)))
+    player["hunger"] = max(0, player.get("hunger", 100) - loss)
+    # Starvation damage
+    if player["hunger"] <= 0:
+        player["health"] = max(0, player["health"] - 2)
+    else:
+        # Slow regen
+        player["health"] = min(100, player["health"] + 1)
+    # Update derived age
+    player["age"] = player_age(state)
+    # Decay temporary buffs
+    buffs = player.get("buffs") or {}
+    for k in list(buffs.keys()):
+        buffs[k] = max(0, buffs[k] - 1) if buffs[k] > 0 else min(0, buffs[k] + 1)
+        if buffs[k] == 0:
+            buffs.pop(k, None)
+    # Death by old age
     if player["age"] > 70 and random.random() < 0.02:
+        player["dead"] = True
+    if player["health"] <= 0:
         player["dead"] = True
 
 
-def advance_time(state, days=7):
+def advance_time(state, weeks=1, days=None):
+    """Advance the world by N weeks. `days` kept for backwards compatibility (1 day = 1/7 week)."""
     _ensure_state_fields(state)
-    iterations = max(1, days // 7) if days >= 7 else 1
-    step = 7 if days >= 7 else days
-    for _ in range(iterations):
-        state["day"] = state.get("day", 0) + step
-        day = state["day"]
+    if days is not None and weeks == 1:
+        # Legacy days input
+        weeks = max(1, int(round(days / 7)))
+    weeks = max(1, int(weeks))
+    for _ in range(weeks):
+        state["turn"] = state.get("turn", 0) + 1
+        state["day"] = state["turn"]
+        day = state["turn"]
         _age_and_die(state, day)
         _marry_and_birth(state, day)
         _economy_tick(state, day)
@@ -403,6 +441,15 @@ def advance_time(state, days=7):
         _player_tick(state)
         if len(state["history"]) > 250:
             state["history"] = state["history"][-250:]
+    # Auto-unlock family quests at the end of advancement
+    try:
+        from family_quests import unlock_age_appropriate
+        newly = unlock_age_appropriate(state)
+        for q in newly:
+            _push_event(state, state["turn"], "aile_görevi_açıldı",
+                        f"Yeni aile görevi: {q['title']}")
+    except Exception:
+        pass
     return state
 
 
@@ -433,14 +480,14 @@ def soldier_check(state):
     player["reputation"] -= 3
     enforcer = random.choice(enforcers)
     if player["crime"] >= 80:
-        # Imprisonment: skip several days, reset crime partially
-        days_in_jail = random.randint(14, 30)
+        # Imprisonment: skip several weeks, reset crime partially
+        weeks_in_jail = random.randint(2, 6)
         player["crime"] = max(0, player["crime"] - 50)
         _push_event(state, state["day"], "hapis",
-                    f"{player['name']} {loc['name']}'de tutuklandı, {days_in_jail} gün zindanda kaldı.")
+                    f"{player['name']} {loc['name']}'de tutuklandı, {weeks_in_jail} hafta zindanda kaldı.")
         # advance silently
-        advance_time(state, days=days_in_jail)
-        return {"type": "hapis", "by": enforcer["name"], "fine": fine, "days": days_in_jail}
+        advance_time(state, weeks=weeks_in_jail)
+        return {"type": "hapis", "by": enforcer["name"], "fine": fine, "weeks": weeks_in_jail}
     else:
         player["crime"] = max(0, player["crime"] - 10)
         _push_event(state, state["day"], "yakalandı",

@@ -17,6 +17,7 @@ import NPCDetail from "@/pages/NPCDetail";
 import Relationships from "@/pages/Relationships";
 import Chronicle from "@/pages/Chronicle";
 import Quests from "@/pages/Quests";
+import FamilyQuests from "@/pages/FamilyQuests";
 import Battle from "@/pages/Battle";
 
 function Protected({ children }) {
@@ -59,6 +60,7 @@ export default function App() {
               <Route path="iliskiler" element={<Relationships />} />
               <Route path="tarih" element={<Chronicle />} />
               <Route path="gorevler" element={<Quests />} />
+              <Route path="aile" element={<FamilyQuests />} />
               <Route path="savas" element={<Battle />} />
             </Route>
             <Route path="*" element={<Navigate to="/oyun" replace />} />

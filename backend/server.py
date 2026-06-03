@@ -30,6 +30,10 @@ app = FastAPI(title="Kronikler: Küllerin Mirası API")
 async def on_startup():
     await db.users.create_index("email", unique=True)
     await db.game_states.create_index("user_id", unique=True)
+    # V3 migration: purge any game_state without schema_version=v3
+    res = await db.game_states.delete_many({"schema_version": {"$ne": "v3"}})
+    if res.deleted_count:
+        logger.info("Purged %d legacy game_state(s) for v3 migration", res.deleted_count)
     logger.info("DB indexes ready")
 
 
