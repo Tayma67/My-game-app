@@ -15,27 +15,24 @@ Mobile-first text-based RPG / life-sim. Player is an ordinary person in a proced
 - **Frontend (React + Tailwind + Shadcn)**: `App.js` routing; `AuthContext` (localStorage `kkm_token`); `GameContext` (state + actions). Pages: Login, Register, NewGame, GameLayout (responsive sidebar + mobile bottom nav), WorldMap, CityDetail, CharacterSheet, Inventory, NPCList, NPCDetail, Relationships, Chronicle, Quests, Battle.
 
 ## What's implemented (Feb 2026)
-- ✅ JWT auth (register/login/me) with bcrypt
-- ✅ Procedural world (kingdoms with kings/heirs, cities/villages/castles with population/wealth/security/prosperity/prices, ~100 NPCs with personality, family bonds, goals, mood)
-- ✅ One game state per user, auto-save on every action
-- ✅ Time advance (1 day / 1 week) — NPCs age, marry, have children, die; kings die and heirs ascend; new heirs picked
-- ✅ Living economy — 7 goods with per-location prices that drift with wealth/security and respond to trades
-- ✅ Random world events (haydut baskını, kıtlık, savaş ilanı, barış, isyan, şenlik) with chronicle entries
-- ✅ Player actions: travel, work, change job, buy/sell, commit crime (4 types with caught/success outcomes), text-based battle with combat log, accept/complete dynamic quests
-- ✅ NPC chat with 7 topics, personality-aware responses, relationship band (dost/arkadaş/nötr/rakip/düşman)
-- ✅ Marriage with NPCs (≥60 relationship gate)
-- ✅ Family tree, history chronicle, market comparison table
-- ✅ Responsive UI (desktop sidebar + mobile bottom tab bar), Cinzel/Lora fonts, grain overlay, ember-themed buttons
+### Iteration 1 (MVP)
+- ✅ JWT auth, procedural world (3 kingdoms, 3 cities, 10 villages, 5 castles, ~100 NPCs)
+- ✅ NPC families, marriage/birth/death/royal succession, time advance, history chronicle
+- ✅ Living economy drift, dynamic quests, text battle, crime, NPC chat (template), responsive UI
 
-## Personas
-- Solo player who wants a meditative "living world" sandbox: log in, advance a few weeks, watch the world breathe, occasionally intervene as a farmer/merchant/soldier.
+### Iteration 2 (Real game logic upgrade)
+- ✅ **NPC memory**: per-NPC `interactions` counter per topic + `memory[]` log of last 20 chats. Repeated questions trigger irritation lines ("Yine mi aynı soru?", "Sabrımı sınama") and start hurting relationship at 3+ repeats.
+- ✅ **Varied dialogue**: response is deterministically seeded by (npc_id, topic, day, turn) so repeats produce different lines from multi-phrase pools.
+- ✅ **Faction roles**: kings/lords refuse audience to low-status low-reputation players (`KING_REJECT`/`LORD_FORMAL`). Soldiers threaten players with crime ≥ 30. Merchants reference local supply state (scarce/abundant/normal).
+- ✅ **Real economy**: each location has `market[good] = {price, supply, demand, base}`. Production from NPC professions (çiftçi→buğday, demirci→demir, …) adds supply each tick; population consumption depletes it. Price formula `base * (demand/supply)^0.45 * wealth_factor`. Player trades directly move supply/demand. NPC merchants do arbitrage between cheap/expensive locations.
+- ✅ **Combat against specific NPCs**: `/api/game/attack_npc` kills target permanently (alive=False persists), scales by social status, large crime/reputation hit. Killing nobility adds player to `wanted_in` for that kingdom.
+- ✅ **Soldier enforcement**: `soldier_check` runs after work/travel/crime/attack and fines or imprisons the player based on crime + city security + soldier presence.
+- ✅ **UI surfacing**: NPC Detail shows SALDIR button + memory log "Hatırladıkları"; City Detail shows Arz/Talep/Fiyat with scarcity coloring.
 
 ## Backlog (P0 → P2)
-- **P1**: lord/castle takeover loop (currently `/api/game/job` blocks "lord"), pregnancy + child-of-player succession (player aging → death → continue as child), siege/army battles between kingdoms with player as commander.
-- **P2**: more granular relationships among NPCs themselves (gossip, alliances), per-NPC schedule/movement, religion conflicts, more procedurally generated quest types (assassination, escort, lord intrigue), shareable world snapshots, sound atmosphere.
-- **P2**: replace `@app.on_event` with FastAPI lifespan, tighten CORS for production, return diffs instead of full state to save bandwidth.
-
-## Next action items
-1. Iterate on player feedback re: pacing (how fast world should move).
-2. Wire lord/castle takeover and player succession to make the "endless world" promise hit harder.
-3. Add a Family/Children dedicated screen once succession lands.
+- **P1**: lord/castle takeover loop (own a kale + collect taxes); player aging → death → continue as child.
+- **P1**: kingdom-level army battles (siege/raid) where player can command troops; turn `at_war_with` flags into actual battles that decide territory.
+- **P2**: NPC↔NPC relationships (gossip, alliances, vendettas), per-NPC schedule/movement, religion conflicts.
+- **P2**: Persistent quest chains, assassination contracts, escort missions tied to NPC personal events.
+- **P2**: Unify all endpoint return shapes to `{state, ...}` for consistency (currently mixed).
+- **P3**: Shareable Chronicle card export (social shareability hook).
