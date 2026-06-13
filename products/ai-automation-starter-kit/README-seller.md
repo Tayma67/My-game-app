@@ -2,15 +2,15 @@
 
 Bu, ÜRÜNÜ SATIŞA KOYARKEN senin kullanacağın özet. (Alıcı bunu görmez.)
 
-## Yüklenecek dosya(lar)
-- `the-kit.md` → alıcının aldığı asıl içerik. İstersen önce PDF'e çevir
-  (herhangi bir "Markdown to PDF" aracı veya Google Docs'a yapıştır → PDF
-  indir). Gumroad PDF'i sever; ama .md de yüklenebilir.
+## Yüklenecek dosya(lar) — HAZIR, dönüştürme YOK
+- **Ürün dosyası:** `AI-Automation-Starter-Kit.pdf` → direkt Gumroad'a yükle.
+  (the-kit.md'yi PDF yapma derdi bitti, hazır PDF burada.)
+- **Kapak:** `cover.png` (veya `cover.jpg`) → direkt yükle. 1280×720, PNG/JPEG.
+  SVG'yi unut; Gumroad PNG/JPEG ister, ikisi de hazır.
 
 ## Gumroad ürün ayarları
 - **İsim:** AI Automation Starter Kit — 10 No-Code Automations
-- **Kapak görseli:** `cover.svg` (önce PNG'e çevir: herhangi bir "SVG to PNG"
-  sitesi, 1280×720). Gumroad PNG/JPG ister.
+- **Kapak görseli:** `cover.png` (hazır, 1280×720). Direkt yükle.
 - **Açıklama:** `sales-page.md` içeriğini yapıştır.
 - **Fiyat:** $14 (lansman). Sonra $24'e çıkar.
 - **Kategori:** Business / Education / Self Improvement
