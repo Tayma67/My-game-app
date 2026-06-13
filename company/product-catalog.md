@@ -13,7 +13,12 @@ Senin tek işin Gumroad'da yeni ürün açıp dosyaları yüklemek.
 | 6 | Small Business Social Media AI Kit | KOBİ sosyal medya | $9.99 | Yayına hazır |
 | 7 | Coach & Consultant's AI Kit | Koç/danışman | $12.99 | Yayına hazır |
 | 8 | Local Business AI Kit | Restoran/yerel hizmet | $9.99 | Yayına hazır |
-| B | Complete AI Side-Income Bundle | Hepsi bir arada | $34.99 | Yayına hazır |
+| 9 | E-commerce Store AI Kit | Online satıcı/Shopify | $11.99 | Yayına hazır |
+| 10 | Content Creator's AI Kit | YouTuber/influencer | $11.99 | Yayına hazır |
+| B | Complete AI Side-Income Bundle | İlk 8 kit bir arada | $34.99 | Yayına hazır |
+
+> Not: Bundle ilk 8 kiti içeriyor. Ürün #9-10 eklendi; istenirse bundle
+> `tools/build_product.py` ile 10 kit olacak şekilde yeniden üretilebilir.
 
 Her ürünün ayrıca ücretsiz **3-prompt teaser** sürümü var (`*/teaser/`) —
 Gumroad'a $0 lead-magnet olarak konur, tam ürüne yönlendirir.
