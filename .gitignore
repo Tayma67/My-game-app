@@ -6,3 +6,6 @@ __pycache__/
 .DS_Store
 dist/
 build/
+.env.etsy
+etsy_token*
+*.secret
