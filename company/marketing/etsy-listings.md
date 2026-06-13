@@ -40,6 +40,22 @@ Yükleyeceğin dosya: ilgili `*.pdf`. Görsel: `cover.png`.
 > PERFECT FOR: handmade, print-on-demand, and digital Etsy sellers.
 > Digital product — no physical item shipped.
 
+## 5) Real Estate Agent's AI Kit
+**Title:** Real Estate Agent AI Prompts, Listing Description Templates, Realtor Lead Follow Up Scripts, ChatGPT for Realtors, Instant Download
+**Tags:** real estate, realtor, listing template, ai prompts, chatgpt prompts, real estate marketing, lead follow up, agent tools, social media, digital download, realtor templates, broker, small business
+**Description:**
+> Write listings, follow up with every lead, and sound polished in client comms. 12 copy-paste AI prompts for real estate agents — listing descriptions, social posts, lead follow-up sequences, market updates — on a FREE ChatGPT or Claude account. Instant PDF download.
+> NOTE: You verify all facts and follow local advertising/fair-housing rules.
+> Digital product — no physical item shipped.
+
+## 6) Small Business Social Media AI Kit
+**Title:** Social Media Content Calendar AI Prompts, Caption Templates for Small Business, ChatGPT Content Planner, Instagram Marketing, Instant Download
+**Tags:** social media, content calendar, ai prompts, chatgpt prompts, instagram, captions, small business, marketing, content planner, digital download, social media manager, reels, side hustle
+**Description:**
+> Plan, write, and repurpose a month of social content in about an hour. 12 copy-paste AI prompts: 30-day calendar, captions, hooks, repurposing, Reels scripts, and a monthly review — on a FREE ChatGPT or Claude account. Instant PDF download. Lifetime updates.
+> PERFECT FOR: small business owners and solopreneurs.
+> Digital product — no physical item shipped.
+
 ---
 ## Etsy mağaza kurulum notları (sen)
 - Etsy → Sell on Etsy → dijital mağaza aç (kimlik + banka/Payoneer gerekir).

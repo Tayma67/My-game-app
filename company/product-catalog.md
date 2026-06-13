@@ -9,6 +9,11 @@ Senin tek işin Gumroad'da yeni ürün açıp dosyaları yüklemek.
 | 2 | Win-the-Client Proposal Pack | Freelancer satış | $9.99 | Yayına hazır |
 | 3 | Job Seeker's AI Kit | İş arayanlar | $9.99 | Yayına hazır |
 | 4 | Etsy Seller's AI Toolkit | Etsy satıcıları | $9.99 | Yayına hazır |
+| 5 | Real Estate Agent's AI Kit | Emlakçılar | $12.99 | Yayına hazır |
+| 6 | Small Business Social Media AI Kit | KOBİ sosyal medya | $9.99 | Yayına hazır |
+
+Her ürünün ayrıca ücretsiz **3-prompt teaser** sürümü var (`*/teaser/`) —
+Gumroad'a $0 lead-magnet olarak konur, tam ürüne yönlendirir.
 
 ## Her ürün için yükleme (Gumroad)
 Her klasörde 3 dosya var:
@@ -27,9 +32,9 @@ linkedin, interview, ai prompts`; etsy kit → `etsy, etsy seo, print on demand,
 small business, ai prompts, marketing`.
 
 ## Bundle fırsatı (ortalama sepeti yükseltir)
-Gumroad'da 4 ürünü tek "bundle" olarak da sat:
-- **İsim:** The Complete AI Side-Income Bundle (4 kits)
-- **Fiyat:** $24.99 (tek tek ~$40 ederdi → indirim algısı)
+Gumroad'da 6 ürünü tek "bundle" olarak da sat:
+- **İsim:** The Complete AI Side-Income Bundle (6 kits)
+- **Fiyat:** $29.99 (tek tek ~$62 ederdi → güçlü indirim algısı)
 - **Mantık:** Araştırma, gelirin tek üründen değil katalog + paketlemeden
   geldiğini gösteriyor. Bundle, alıcı başına geliri artırır.
 
