@@ -60,4 +60,12 @@ Yükleyeceğin dosya: ilgili `*.pdf`. Görsel: `cover.png`.
 ## Etsy mağaza kurulum notları (sen)
 - Etsy → Sell on Etsy → dijital mağaza aç (kimlik + banka/Payoneer gerekir).
 - Her ürünü "Digital" olarak ekle, PDF'i yükle, yukarıdaki metinleri yapıştır.
-- Kapak (cover.png) + ek görsel olarak içerik önizlemesi koy (dönüşümü artırır).
+
+## 📸 Görsel stratejisi (araştırma-temelli — Etsy sıralamasını belirler)
+Etsy sıralaması büyük ölçüde **ilk görselin tıklanma oranına (CTR)** bağlı.
+Görseller **en az 2000px** (zoom/güven için) ve **4:3 oran** olmalı. Bunun için
+her üründe özel Etsy görselleri ürettim (1280×720 kapaklar Etsy için küçük/yanlış oran):
+- **Slot 1 (thumbnail):** `etsy-cover.png` (2000×1500, 4:3) — en kritik görsel.
+- **Slot 2:** `etsy-preview.png` (içindekiler listesi) — "ne alıyorum" sorusunu yanıtlar.
+- **Slot 3-5:** PDF'ten 1-2 sayfa ekran görüntüsü ekle (içeriği göster).
+- 20 slota kadar görsel kullanmak dönüşümü artırır. Ağır filtre kullanma.
