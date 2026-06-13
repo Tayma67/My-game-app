@@ -30,9 +30,15 @@ birlikte yürütmek:
 
 ## Ödeme rayı (Türkiye — yapılması zorunlu, yalnızca SEN)
 
-1. **Payoneer hesabı aç** (ücretsiz, KYC/kimlik gerekir). Bu, Gumroad,
-   Upwork, Fiverr, Amazon, Etsy ödemelerini Türk bankana çekmenin yoludur.
-2. Stripe/PayPal/Wise'ı unut — Türkiye'de çalışmıyor.
+> ✅ DOĞRULANDI (13.06.2026, ekran görüntüsüyle): **Gumroad Türk bankasına
+> DOĞRUDAN, TL olarak ödüyor** (IBAN + SWIFT/BIC ile). Yani Gumroad için
+> Payoneer GEREKMİYOR — kendi IBAN'ını girmen yeterli.
+> Gumroad banka formu alanları: Pay to the order of (banka adın birebir) ·
+> SWIFT/BIC (QNB Finansbank: FNNBTRISXXX — bankandan doğrula) · IBAN · Confirm.
+
+1. **Gumroad için:** ödeme ayarına kendi TR IBAN'ını gir (Payoneer'e gerek yok).
+2. **Payoneer'i sonra aç** — sadece Fiverr/Upwork hizmet kanalı için gerekli.
+3. Stripe/PayPal/Wise'ı unut — Türkiye'de çalışmıyor.
 3. Vergi: Düzenli gelir başlayınca bir **SMMM/mali müşavir**'e durumunu
    sınıflandırt (sosyal içerik istisnası vs. şahıs şirketi). Şimdilik bloke
    değil ama ilk gelirle birlikte halledilmeli.
