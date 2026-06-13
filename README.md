@@ -37,10 +37,10 @@ sıfır olabilir ama "insan zamanı sıfır" olamaz — bu fiziksel bir gerçek.
 - [x] Araştırma (5/5 açı tamam, kaynaklı)
 - [x] Organizasyon ve plan kuruldu
 - [x] Ürün #1 CANLI: AI Automation Starter Kit (gumroad.com/l/lzrnk, $9.99)
-- [x] 6 ürün yayına hazır (Proposal, Job Seeker, Etsy, Real Estate, Social Media) + her birine ücretsiz teaser
+- [x] 8 ürün + 1 bundle yayına hazır (bkz. company/product-catalog.md)
 - [x] Üretim hattı: tools/build_product.py (Markdown → kapak + PDF, dakikalar içinde yeni ürün)
-- [x] Etsy listeleme metinleri (6 ürün) — company/marketing/etsy-listings.md
-- [x] SEO açılış sayfası (site/) + Gumroad Discover kurulumu
+- [x] Etsy listeleme metinleri + SEO açılış sayfası (site/) + 3 SEO blog yazısı + sitemap/robots
+- [x] Gumroad Discover kurulumu + her ürüne ücretsiz teaser (lead-magnet)
 - [x] Freelance kanalı: 3 productized gig (company/freelance-channel/)
 - [ ] Etsy/Gumroad'da ürünleri listele + Discover'ı aç (SENİN aksiyonun, KYC)
-- [ ] (Opsiyonel) 6'lı bundle ($29.99)
+- [ ] Bundle'ı yayınla ($34.99) + siteyi GitHub Pages/Netlify ile aç

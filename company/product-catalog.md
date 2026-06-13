@@ -11,6 +11,9 @@ Senin tek işin Gumroad'da yeni ürün açıp dosyaları yüklemek.
 | 4 | Etsy Seller's AI Toolkit | Etsy satıcıları | $9.99 | Yayına hazır |
 | 5 | Real Estate Agent's AI Kit | Emlakçılar | $12.99 | Yayına hazır |
 | 6 | Small Business Social Media AI Kit | KOBİ sosyal medya | $9.99 | Yayına hazır |
+| 7 | Coach & Consultant's AI Kit | Koç/danışman | $12.99 | Yayına hazır |
+| 8 | Local Business AI Kit | Restoran/yerel hizmet | $9.99 | Yayına hazır |
+| B | Complete AI Side-Income Bundle | Hepsi bir arada | $34.99 | Yayına hazır |
 
 Her ürünün ayrıca ücretsiz **3-prompt teaser** sürümü var (`*/teaser/`) —
 Gumroad'a $0 lead-magnet olarak konur, tam ürüne yönlendirir.
