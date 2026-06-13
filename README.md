@@ -34,7 +34,9 @@ sıfır olabilir ama "insan zamanı sıfır" olamaz — bu fiziksel bir gerçek.
 
 ## Durum
 
-- [x] Araştırma (4/5 açı tamam, 5. açı Türkiye ödeme/vergi sürüyor)
+- [x] Araştırma (5/5 açı tamam, kaynaklı)
 - [x] Organizasyon ve plan kuruldu
-- [ ] İlk gelir kanalı seçimi (senin kararın bekleniyor)
-- [ ] Ödeme rayı kurulumu (senin aksiyonun bekleniyor)
+- [x] Ürün #1 satışa hazır: AI Automation Starter Kit (içerik + kapak + satış metni)
+- [x] Ürün #2 hazır: Freelancer Proposal Pack (cross-sell)
+- [ ] Payoneer + Gumroad hesabı (SENİN aksiyonun — bkz. company/launch-checklist.md)
+- [ ] İlk yayın + tanıtım
