@@ -12,7 +12,7 @@ Bu, ÜRÜNÜ SATIŞA KOYARKEN senin kullanacağın özet. (Alıcı bunu görmez.
 - **İsim:** AI Automation Starter Kit — 10 No-Code Automations
 - **Kapak görseli:** `cover.png` (hazır, 1280×720). Direkt yükle.
 - **Açıklama:** `sales-page.md` içeriğini yapıştır.
-- **Fiyat:** $14 (lansman). Sonra $24'e çıkar.
+- **Fiyat:** $9.99 (lansman). Sonra $24'e çıkar.
 - **Kategori:** Business / Education / Self Improvement
 - **"Pay what you want":** kapalı (sabit $14 başla).
 

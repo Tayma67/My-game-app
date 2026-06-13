@@ -22,7 +22,7 @@ Lead replies · invoice reminders · content repurposing · customer FAQ ·
 weekly reports · social posts · cold-email drafts · meeting notes · review
 requests · data cleanup.
 
-**Price: $14** (launch price — going to $24)
+**Price: $9.99** (launch price — going to $24)
 
 > Honest note: automation is a tool, not magic. These blueprints save you
 > time; what you do with that time is up to you. 30-day no-questions refund.
