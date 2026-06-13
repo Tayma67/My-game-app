@@ -15,6 +15,8 @@ Senin tek işin Gumroad'da yeni ürün açıp dosyaları yüklemek.
 | 8 | Local Business AI Kit | Restoran/yerel hizmet | $9.99 | Yayına hazır |
 | 9 | E-commerce Store AI Kit | Online satıcı/Shopify | $11.99 | Yayına hazır |
 | 10 | Content Creator's AI Kit | YouTuber/influencer | $11.99 | Yayına hazır |
+| 11 | Fitness Coach's AI Kit | PT/online koç/gym | $11.99 | Yayına hazır |
+| 12 | Teacher & Tutor's AI Kit | Öğretmen/tutor/homeschool | $11.99 | Yayına hazır |
 | B | Complete AI Side-Income Bundle | 10 kit bir arada (110+ prompt) | $39.99 | Yayına hazır |
 
 > Her üründe ayrıca **Etsy-optimize görseller** var: `etsy-cover.png`
