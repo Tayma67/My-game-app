@@ -9,3 +9,4 @@ build/
 .env.etsy
 etsy_token*
 *.secret
+.etsy_pkce_verifier
