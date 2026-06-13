@@ -38,5 +38,6 @@ sıfır olabilir ama "insan zamanı sıfır" olamaz — bu fiziksel bir gerçek.
 - [x] Organizasyon ve plan kuruldu
 - [x] Ürün #1 satışa hazır: AI Automation Starter Kit (içerik + kapak + satış metni)
 - [x] Ürün #2 hazır: Freelancer Proposal Pack (cross-sell)
-- [ ] Payoneer + Gumroad hesabı (SENİN aksiyonun — bkz. company/launch-checklist.md)
+- [x] Freelance kanalı satışa hazır: 3 productized gig (company/freelance-channel/)
+- [ ] Payoneer + Gumroad + Fiverr hesabı (SENİN aksiyonun)
 - [ ] İlk yayın + tanıtım
