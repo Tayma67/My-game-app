@@ -36,8 +36,10 @@ sıfır olabilir ama "insan zamanı sıfır" olamaz — bu fiziksel bir gerçek.
 
 - [x] Araştırma (5/5 açı tamam, kaynaklı)
 - [x] Organizasyon ve plan kuruldu
-- [x] Ürün #1 satışa hazır: AI Automation Starter Kit (içerik + kapak + satış metni)
-- [x] Ürün #2 hazır: Freelancer Proposal Pack (cross-sell)
-- [x] Freelance kanalı satışa hazır: 3 productized gig (company/freelance-channel/)
-- [ ] Payoneer + Gumroad + Fiverr hesabı (SENİN aksiyonun)
-- [ ] İlk yayın + tanıtım
+- [x] Ürün #1 CANLI: AI Automation Starter Kit (gumroad.com/l/lzrnk, $9.99)
+- [x] Ürün #2-4 yayına hazır: Proposal Pack, Job Seeker Kit, Etsy Toolkit (bkz. company/product-catalog.md)
+- [x] Üretim hattı: tools/build_product.py (Markdown → kapak + PDF, dakikalar içinde yeni ürün)
+- [x] Freelance kanalı: 3 productized gig (company/freelance-channel/)
+- [x] Pasif trafik planı: Gumroad Discover kurulumu (company/marketing/)
+- [ ] Ürün #2-4'ü yayınla + Discover'ı aç (SENİN aksiyonun)
+- [ ] (Opsiyonel) 4'lü bundle ($24.99)
