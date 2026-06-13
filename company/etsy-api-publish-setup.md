@@ -9,6 +9,16 @@ Etsy API'si kimlik doğrulama ister (x-api-key + OAuth). Senin hesabın adına
 işlem yaptığı için yetkiyi yalnızca sen verebilirsin. Ama yetkiden **sonraki
 her şeyi** (listeleri oluşturmak) kod yapar — yani ben.
 
+## 💰 Etsy maliyetleri (doğrulandı — "üyelik ücreti" YOK)
+- Etsy Standard planı **ücretsiz**; zorunlu aylık üyelik yok. Etsy Plus
+  ($10/ay) **isteğe bağlı — alma**.
+- **Listeleme: $0.20/ürün** → 12 ürün ~**$2.40** (tek peşin masraf, kart gerekir).
+- **Satış başına:** %6.5 işlem + ~%3 + $0.25 ödeme işleme (sadece sattığında).
+- ✅ Türkiye: Etsy Payments çalışıyor, para **Türk banka hesabına** yatıyor
+  (PayPal gerekmez). İlk ödeme 3-5 iş günü.
+- Sıfır peşin masraf istersen: **Gumroad ($0 listeleme)** ile başla, Etsy'yi
+  sonra ekle.
+
 ## Senin yapacakların (bir kerelik)
 1. **Etsy mağazanı aç** (kimlik doğrulama — KYC).
 2. **Etsy Developer'a app kaydı aç:** etsy.com/developers/register → app
