@@ -1,5 +1,19 @@
 # Girişim Planı — Sıfır Sermayeden İlk Liraya
 
+## Temel ilke: ÖNCE DOĞRULA, SONRA SAT (risk azaltma)
+
+İşlevsel mi/isteyen var mı bilmeden satış yapmak risklidir. Bu yüzden:
+
+1. **İşlev riski yok:** Ürünlerimiz yazılım değil, tam içeriği görünür
+   belgeler. Alıcı ne aldığını görür + Gumroad 30 gün iade. Vaporware yok.
+2. **Talep riskini önce kır:** Ürünü büyük tanıtıma sokmadan önce küçük bir
+   kitleye sor ("şöyle bir kit işine yarar mı?"). İlgi/ön-kayıt gelmezse
+   ürünü değiştir; gelirse devam et. Para ve zaman, talebi doğrulanmış işe
+   gider — körlemesine değil.
+3. **En düşük riskli model = hizmet:** Freelance'te müşteri ne istediğini
+   söyler, sen teslim edersin, o görüp onaylar — "görülmeden satış" riski
+   yapısal olarak yoktur. Hız istersen bu kanala döneriz.
+
 ## Strateji: "İki kanallı" bootstrap
 
 Araştırma net: sıfır sermaye + az zaman + sıfır kitle ile garanti yok ve
