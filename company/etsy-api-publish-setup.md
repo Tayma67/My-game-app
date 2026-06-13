@@ -9,10 +9,12 @@ Etsy API'si kimlik doğrulama ister (x-api-key + OAuth). Senin hesabın adına
 işlem yaptığı için yetkiyi yalnızca sen verebilirsin. Ama yetkiden **sonraki
 her şeyi** (listeleri oluşturmak) kod yapar — yani ben.
 
-## 💰 Etsy maliyetleri (doğrulandı — "üyelik ücreti" YOK)
-- Etsy Standard planı **ücretsiz**; zorunlu aylık üyelik yok. Etsy Plus
-  ($10/ay) **isteğe bağlı — alma**.
-- **Listeleme: $0.20/ürün** → 12 ürün ~**$2.40** (tek peşin masraf, kart gerekir).
+## 💰 Etsy maliyetleri (DÜZELTİLDİ — ekran görüntüsüyle)
+- ⚠️ **Tek seferlik kurulum ücreti: ~$15 (693 TL).** Etsy yeni mağaza açarken
+  bunu alıyor (kart blokajı, mağaza açılınca çekilir). "Geri alma" teklifi
+  olabilir ama şartı belirsiz. **Bu peşin bir masraf** — sıfır sermayede engel.
+- Aylık zorunlu üyelik YOK; Etsy Plus ($10/ay) isteğe bağlı — alma.
+- **Listeleme: $0.20/ürün** → 12 ürün ~$2.40 (kurulum ücretine ek).
 - **Satış başına:** %6.5 işlem + ~%3 + $0.25 ödeme işleme (sadece sattığında).
 - ✅ Türkiye: Etsy Payments çalışıyor, para **Türk banka hesabına** yatıyor
   (PayPal gerekmez). İlk ödeme 3-5 iş günü.

@@ -8,6 +8,9 @@ Tüm üretim hazır. Bu dosya, **senin** ne yapacağını öncelik sırasıyla s
 
 ---
 
+> ⚠️ MALİYET NOTU: Etsy mağaza açarken **tek seferlik ~$15 (693 TL) kurulum
+> ücreti** alıyor. Gumroad **$0** (kurulum yok). Sıfır sermayede ÖNCE Gumroad.
+
 ## ⏱️ Bugün (30-45 dk) — Ödeme + ilk listeleme
 1. **Payoneer hesabı aç** (payoneer.com) — Fiverr/Etsy ödemeleri için. ~10 dk + onay.
 2. Ürün #1 zaten CANLI (gumroad.com/l/lzrnk). Gumroad'da **Discover'ı aç** +
