@@ -1,8 +1,7 @@
-# The Complete AI Side-Income Bundle — 8 Kits, 90+ Prompts
+# The Complete AI Side-Income Bundle — 10 Kits, 110+ Prompts
 
-Everything in one place: 8 complete AI prompt kits for freelancers, job
-seekers, Etsy sellers, real estate agents, coaches, local businesses, and
-small business owners. Works on a free ChatGPT or Claude account.
+Everything in one place: 10 complete AI prompt kits. Works on a free
+ChatGPT or Claude account. No code, no expensive tools.
 
 ---
 
@@ -731,6 +730,174 @@ ChatGPT or Claude account. No marketing budget required.
 ---
 
 dükkan, yerel hizmetler için geniş niş.]*
+
+---
+
+# The E-commerce Store AI Kit — Descriptions, Emails & Ads That Sell
+
+12 copy-paste AI prompts to write product descriptions, email flows, and ad
+copy for your online store — on a free ChatGPT or Claude account. Works for
+Shopify, WooCommerce, or any storefront.
+
+> How to use: replace [BRACKETS]. Keep claims truthful and compliant with ad
+> platform rules. AI drafts; you approve and test.
+
+---
+
+## Part 1 — Product Pages
+
+## 1. High-converting product description
+> Act as a DTC copywriter. Product: "[NAME + key features + who it's for]".
+> Write a product description: a benefit-led hook, a short story/feeling
+> paragraph, scannable feature→benefit bullets, and a confidence line
+> (guarantee/shipping). Persuasive, honest, no hype.
+
+## 2. Bullet benefits (not just features)
+> Turn these features into benefit bullets a shopper cares about: "[LIST]".
+> Format each as "Feature → what it means for you". Keep them punchy.
+
+## 3. SEO meta title + description
+> Write an SEO meta title (≤60 chars) and meta description (≤155 chars) for
+> this product: "[DETAILS]". Include the main keyword naturally and a reason
+> to click.
+
+---
+
+## Part 2 — Email Marketing
+
+## 4. Welcome email
+> Write a welcome email for a new subscriber to "[STORE/NICHE]". Warm intro,
+> what to expect, a first-purchase incentive, one clear CTA. ≤180 words.
+
+## 5. Abandoned-cart sequence (3 emails)
+> Write a 3-email abandoned-cart sequence for "[PRODUCT]". Email 1 (reminder,
+> 1h), Email 2 (handle objection + social proof, 24h), Email 3 (urgency/last
+> chance, 48h). Friendly, not desperate.
+
+## 6. Product-launch email
+> Write a launch email announcing "[NEW PRODUCT]" to my list. Build
+> anticipation, 3 key benefits, a launch offer, clear CTA. ≤200 words.
+
+## 7. Post-purchase / review request
+> Write a post-purchase email thanking the buyer of "[PRODUCT]", giving a quick
+> usage tip, and asking for a review with a 1-click link. Warm and helpful.
+
+---
+
+## Part 3 — Ads & Social
+
+## 8. Facebook/Instagram ad copy (3 angles)
+> Write 3 ad variations for "[PRODUCT]": one problem-led, one benefit-led, one
+> social-proof-led. Each: a hook, 2 lines of body, a CTA. Compliant, no
+> exaggerated claims.
+
+## 9. Google Shopping / search ad
+> Write 3 headlines (≤30 chars) and 2 descriptions (≤90 chars) for a search ad
+> for "[PRODUCT]". Keyword-relevant, benefit-focused, clear CTA.
+
+## 10. Organic social posts
+> Write 7 social posts to promote "[STORE]": product highlights, UGC prompt,
+> behind-the-scenes, a question, and one soft sale. ≤200 chars each.
+
+---
+
+## Part 4 — Optimize
+
+## 11. A/B test ideas
+> Give me 8 things to A/B test on my product page / ads for "[PRODUCT]" to lift
+> conversions, ranked by likely impact and ease. One line each.
+
+## 12. Customer service responses
+> Write friendly templates for: order status, return/refund request, "where is
+> my order", and a damaged-item complaint. On-brand for "[STORE]", each ≤60
+> words, solution-focused.
+
+---
+
+satıcı geniş niş; cross-sell: Social Media AI Kit.]*
+
+---
+
+# The Content Creator's AI Kit — Grow Faster, Pitch Brands, Never Run Dry
+
+12 copy-paste AI prompts to plan content, write scripts and captions, grow
+engagement, and pitch brand deals — on a free ChatGPT or Claude account. For
+YouTubers, TikTokers, and Instagram creators.
+
+> How to use: replace [BRACKETS]. AI helps you create faster; your authentic
+> voice is what grows an audience. Edit everything to sound like you.
+
+---
+
+## Part 1 — Never Run Out of Ideas
+
+## 1. 30 video/post ideas in your niche
+> Act as a content strategist for "[NICHE]". Give me 30 content ideas mixing:
+> how-tos, myths/mistakes, story/personal, trends, and listicles. For each: a
+> title + a one-line hook.
+
+## 2. Content pillars + series ideas
+> Suggest 4 content pillars for a "[NICHE]" creator and 2 repeatable series
+> ideas per pillar (formats I can run weekly). Keep it sustainable for a solo
+> creator.
+
+---
+
+## Part 2 — Scripts & Captions
+
+## 3. Short-form video script (Reels/TikTok/Shorts)
+> Write a 30-45s vertical video script on "[TOPIC]": a 3-second hook, 3 quick
+> value beats, and a CTA (follow/comment). Add on-screen text cues.
+
+## 4. Long-form video outline
+> Outline a [8-10 min] YouTube video on "[TOPIC]": a hook, 5-6 sections with
+> key points, a retention loop, and an end-screen CTA.
+
+## 5. Caption that drives engagement
+> Write 5 caption options for a post about "[TOPIC]" for "[AUDIENCE]". Each
+> with a strong first line, value, and an engagement question. No hashtag spam.
+
+## 6. Hook variations
+> Give me 12 scroll-stopping hooks for "[TOPIC]". Mix curiosity, bold claim,
+> relatable problem, and question. No clickbait I can't deliver on.
+
+---
+
+## Part 3 — Grow & Engage
+
+## 7. Reply to comments to boost reach
+> Write friendly, engaging replies to common comment types (praise, question,
+> disagreement, spam) for a "[NICHE]" creator. Encourage more conversation.
+
+## 8. Repurpose one piece into a week
+> Turn this video/post into a week of content: "[PASTE]". Output 3 short clips
+> ideas, 2 carousel ideas, 1 tweet thread, 1 newsletter blurb. Keep my voice.
+
+## 9. Engagement questions / polls
+> Give me 12 quick engagement prompts (this-or-that, fill-in-the-blank, hot
+> takes) for "[NICHE]" to spark comments and shares.
+
+---
+
+## Part 4 — Make Money
+
+## 10. Brand pitch / media kit blurb
+> Write a brand-pitch email for "[BRAND]" from a "[NICHE]" creator with
+> [audience size + 1 engagement stat]. Lead with value to them, propose a
+> simple collab, soft CTA. ≤140 words.
+
+## 11. Rate-card explainer
+> Help me set and explain creator rates for [post types]. Draft a short,
+> confident message stating my rates and what's included, framed around the
+> value/results for the brand.
+
+## 12. Sponsorship disclosure + integration
+> Write a natural, FTC-compliant way to disclose and integrate a sponsorship
+> for "[PRODUCT]" into my "[CONTENT TYPE]" without killing the vibe.
+
+---
+
+yaratıcı nişi; cross-sell: Social Media AI Kit.]*
 
 ---
 

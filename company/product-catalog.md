@@ -15,10 +15,11 @@ Senin tek işin Gumroad'da yeni ürün açıp dosyaları yüklemek.
 | 8 | Local Business AI Kit | Restoran/yerel hizmet | $9.99 | Yayına hazır |
 | 9 | E-commerce Store AI Kit | Online satıcı/Shopify | $11.99 | Yayına hazır |
 | 10 | Content Creator's AI Kit | YouTuber/influencer | $11.99 | Yayına hazır |
-| B | Complete AI Side-Income Bundle | İlk 8 kit bir arada | $34.99 | Yayına hazır |
+| B | Complete AI Side-Income Bundle | 10 kit bir arada (110+ prompt) | $39.99 | Yayına hazır |
 
-> Not: Bundle ilk 8 kiti içeriyor. Ürün #9-10 eklendi; istenirse bundle
-> `tools/build_product.py` ile 10 kit olacak şekilde yeniden üretilebilir.
+> Her üründe ayrıca **Etsy-optimize görseller** var: `etsy-cover.png`
+> (2000×1500, 4:3, slot 1) + `etsy-preview.png` (içindekiler, slot 2).
+> Fiyat/dönüşüm taktikleri: company/marketing/pricing-and-conversion.md.
 
 Her ürünün ayrıca ücretsiz **3-prompt teaser** sürümü var (`*/teaser/`) —
 Gumroad'a $0 lead-magnet olarak konur, tam ürüne yönlendirir.
