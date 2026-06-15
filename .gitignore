@@ -10,3 +10,6 @@ build/
 etsy_token*
 *.secret
 .etsy_pkce_verifier
+tiktok-ai-streamer/.env
+tiktok-ai-streamer/*.mp4
+*.pcm
